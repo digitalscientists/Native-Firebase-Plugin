@@ -11,6 +11,7 @@
 
 @interface CDVFirebase () {
     NSString *appName;
+    BOOL isUsed;
 }
 @end
 
@@ -35,12 +36,22 @@
     NSString*       callback;
     callback = command.callbackId;
     
+    if (isUsed == YES) {
+        CDVPluginResult* result = [CDVPluginResult
+                                   resultWithStatus: CDVCommandStatus_ERROR
+                                   messageAsString: @"Can't modify config objects after they are in use for Firebase references."
+                                   ];
+        
+        [self.commandDelegate sendPluginResult:result callbackId:callback];
+        return;
+    }
+    
     BOOL persistenceEnabled = YES;
     if ( [command.arguments count] >= 1 )
     {
-        persistenceEnabled = [command.arguments objectAtIndex:0];
+        persistenceEnabled = [[command.arguments objectAtIndex:0] boolValue];
     }
-    [Firebase defaultConfig].persistenceEnabled = persistenceEnabled;
+    [[Firebase defaultConfig] setPersistenceEnabled:persistenceEnabled];
     
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:result callbackId:callback];
@@ -72,10 +83,12 @@
 //    }
     
     Firebase *myRootRef = [[Firebase alloc] initWithUrl: urlString];
+    isUsed = YES;
     // Read data and react to changes
     [myRootRef observeEventType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
         NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
-        NSDictionary *resultDict = @{snapshot.key: snapshot.value};
+        NSDictionary *resultDict = snapshot.value;
+
         CDVPluginResult *result;
         result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
         [self.commandDelegate sendPluginResult:result callbackId:callback];
@@ -84,6 +97,10 @@
 
 - (void)writeData:(CDVInvokedUrlCommand*)command {
     //
+    
+    NSString*       callback;
+    callback = command.callbackId;
+    
     id value = nil;
     if ( [command.arguments count] >= 1 )
     {
@@ -92,8 +109,13 @@
     // Create a reference to a Firebase database URL
     NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     Firebase *myRootRef = [[Firebase alloc] initWithUrl:urlString];
+    isUsed = YES;
     // Write data to Firebase
     [myRootRef setValue: value];
+    
+    CDVPluginResult *result;
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:callback];
 }
 
 @end
