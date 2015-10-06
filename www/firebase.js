@@ -2,8 +2,8 @@
  * cordova is available under *either* the terms of the modified BSD license *or* the
  * MIT License (2008). See http://opensource.org/licenses/alphabetical for full text.
  *
- * Copyright (c) Matt Kane 2010
- * Copyright (c) 2011, IBM Corporation
+ * Copyright (c) LSH 2015
+ * Copyright (c) 2015, CKC
  */
 
 
@@ -21,11 +21,10 @@ function FireBase() {
 /**
  * Read code from scanner.
  *
- * @param {Function} successCallback This function will recieve a result object: {
- *        text : '12345-mock',    // The code that was scanned.
- *        format : 'FORMAT_NAME', // Code format.
- *        cancelled : true/false, // Was canceled.
- *    }
+ * @param {appName} FireBase App Name
+ *
+ * @param {Function} successCallback
+ *
  * @param {Function} errorCallback
  */
 FireBase.prototype.init = function (appName, successCallback, errorCallback) {
