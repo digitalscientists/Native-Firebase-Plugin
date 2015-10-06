@@ -6,7 +6,7 @@
  * Copyright (c) 2015, CKC
  */
 
-
+var FireBaseLoader = function (require, exports, module) {
 var exec = require("cordova/exec");
 
 /**
@@ -14,9 +14,9 @@ var exec = require("cordova/exec");
  *
  * @returns {FireBase}
  */
-function FireBase() {
 
-};
+ function FireBase() {
+ }
 
 /**
  * Read code from scanner.
@@ -116,5 +116,11 @@ FireBase.prototype.writeData = function (object, successCallback, errorCallback)
     exec(successCallback, errorCallback, 'FireBase', 'writeData', [object]);
 };
 
-var FireBase = new FireBase();
-module.exports = FireBase;
+var fireBase = new FireBase();
+module.exports = fireBase;
+
+    }
+
+    FireBaseLoader(require, exports, module);
+
+    cordova.define("cordova/plugin/FireBase", FireBaseLoader);

@@ -25,7 +25,7 @@
         <!-- Cordova >= 2.8 -->
         <config-file target="config.xml" parent="/*">
             <feature name="FireBase">
-                <param name="ios-package" value="FireBase" />
+                <param name="ios-package" value="CDVFirebase" />
             </feature>
         </config-file>
 
