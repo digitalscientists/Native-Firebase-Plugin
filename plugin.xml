@@ -29,6 +29,9 @@
             </feature>
         </config-file>
 
+        <!-- <resource-file src="src/ios/Firebase.framework" /> -->
+        <!-- <resource-file src="src/ios/Firebase.framework" /> -->
+
         <header-file src="src/ios/FireBase.h" />
         <source-file src="src/ios/FireBase.m" />
 
@@ -37,6 +40,6 @@
         <framework src="CFNetwork.framework" />
         <framework src="Security.framework" />
         <framework src="SystemConfiguration.framework" />
-        <framework src="Firebase.framework" />
+        <framework src="src/ios/Firebase.framework" custom="true" />
     </platform>
 </plugin>
