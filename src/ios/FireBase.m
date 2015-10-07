@@ -60,10 +60,7 @@
 - (void)readData:(CDVInvokedUrlCommand*)command {
     //
     NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
-    
-    NSString*       callback;
-    callback = command.callbackId;
-    
+        
     NSObject *object;
     if ( [command.arguments count] >= 1 )
     {
@@ -91,7 +88,8 @@
 
         CDVPluginResult *result;
         result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
-        [self.commandDelegate sendPluginResult:result callbackId:callback];
+        [result setKeepCallback:[NSNumber numberWithBool:YES]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
 }
 
