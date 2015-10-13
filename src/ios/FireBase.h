@@ -37,11 +37,32 @@
 
 
     //child set by AppendingPath
-- (void)childSet: (CDVInvokedUrlCommand*) command;
+- (void)childSet:(CDVInvokedUrlCommand*) command;
 
     //Initializing a Firebase object
 //- (void)initWithUrl:(CDVInvokedUrlCommand*)command;
 
+    //Authenticate using the provided credentials.
+- (void)authWithCustomToken:(CDVInvokedUrlCommand*) command;
+
+//----  Managing presence
+
+- (void)onDisconnectSetValue:(CDVInvokedUrlCommand*) command;
+
+- (void)onDisconnectSetValueWithCompletionBlock:(CDVInvokedUrlCommand*) command;
+
+- (void)onDisconnectRemoveValue:(CDVInvokedUrlCommand*) command;
+
+- (void)onDisconnectRemoveValueWithCompletionBlock:(CDVInvokedUrlCommand*) command;
+
+- (void)onDisconnectUpdateChildValues:(CDVInvokedUrlCommand*) command;
+
+- (void)onDisconnectUpdateChildValuesWithCompletionBlock:(CDVInvokedUrlCommand*) command;
+- (void)cancelDisconnectOperations:(CDVInvokedUrlCommand*) command;
+
+- (void)cancelDisconnectOperationsWithCompletionBlock:(CDVInvokedUrlCommand*) command;
+
+//----  Querying and limiting
 
 //User Login
 - (void)userLogin: (CDVInvokedUrlCommand*) command;
