@@ -59,7 +59,7 @@
 
 - (void)readData:(CDVInvokedUrlCommand*)command {
     //
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     
     NSObject *object;
     if ( [command.arguments count] >= 1 )
@@ -79,7 +79,7 @@
 //        return;
 //    }
     
-    Firebase *myRootRef = [[Firebase alloc] initWithUrl: urlString];
+    Firebase *myRootRef = [[Firebase alloc] initWithUrl: strURL];
     if(isUsed != YES)
         isUsed = YES;
     // Read data and react to changes
@@ -102,17 +102,17 @@
 //Reading Data Once
 - (void)readDataOnceWithURL:(CDVInvokedUrlCommand*)command {
     //
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     
     //NSObject *object;
     if ( [command.arguments count] >= 1 )
     {
         //object = [command.arguments objectAtIndex:0];
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
     }
     
     
-    Firebase *myChildRef = [[Firebase alloc] initWithUrl: urlString];
+    Firebase *myChildRef = [[Firebase alloc] initWithUrl: strURL];
     if(isUsed != YES)
         isUsed = YES;
     // Read data and react to changes
@@ -135,13 +135,13 @@
 //remove all callbacks at a location
 - (void)removeAllCallbacksWithURL:(CDVInvokedUrlCommand*)command {
     //
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     
    if ( [command.arguments count] >= 1 )
     {
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
     }
-    Firebase *myChildRef = [[Firebase alloc] initWithUrl: urlString];
+    Firebase *myChildRef = [[Firebase alloc] initWithUrl: strURL];
     
     [myChildRef removeAllObservers];
     
@@ -153,17 +153,17 @@
 // Attach a block to read the data at our posts reference with detailed URL
 - (void)readValueTypeEventWithURL:(CDVInvokedUrlCommand*)command {
     //
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     
     //NSObject *object;
     if ( [command.arguments count] >= 1 )
     {
         //object = [command.arguments objectAtIndex:0];
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
     }
     
     
-    Firebase *myChildRef = [[Firebase alloc] initWithUrl: urlString];
+    Firebase *myChildRef = [[Firebase alloc] initWithUrl: strURL];
     if(isUsed != YES)
         isUsed = YES;
     // Read data and react to changes
@@ -185,17 +185,17 @@
 // Attach a block to retrieve the data at our reference with detailed URL when child added Evens are triggered
 - (void)RetrieveChildAddedEventWithURL:(CDVInvokedUrlCommand*)command {
     //
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     
     //NSObject *object;
     if ( [command.arguments count] >= 1 )
     {
         //object = [command.arguments objectAtIndex:0];
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
     }
     
     
-    Firebase *myChildRef = [[Firebase alloc] initWithUrl: urlString];
+    Firebase *myChildRef = [[Firebase alloc] initWithUrl: strURL];
     if(isUsed != YES)
         isUsed = YES;
     // Retrieve new posts as they are added to the database
@@ -218,17 +218,17 @@
 // Attach a block to retrieve the data at our reference with detailed URL when child changed Event are triggered
 - (void)RetrieveChildChangedEventWithURL:(CDVInvokedUrlCommand*)command {
     //
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     
     //NSObject *object;
     if ( [command.arguments count] >= 1 )
     {
         //object = [command.arguments objectAtIndex:0];
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
     }
     
     
-    Firebase *myChildRef = [[Firebase alloc] initWithUrl: urlString];
+    Firebase *myChildRef = [[Firebase alloc] initWithUrl: strURL];
     if(isUsed != YES)
         isUsed = YES;
     // Retrieve new posts as they are added to the database
@@ -251,17 +251,17 @@
 // Attach a block to retrieve the data at our reference with detailed URL when child removed Event are triggered
 - (void)RetrieveChildRemovedEventWithURL:(CDVInvokedUrlCommand*)command {
     //
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     
     //NSObject *object;
     if ( [command.arguments count] >= 1 )
     {
         //object = [command.arguments objectAtIndex:0];
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
     }
     
     
-    Firebase *myChildRef = [[Firebase alloc] initWithUrl: urlString];
+    Firebase *myChildRef = [[Firebase alloc] initWithUrl: strURL];
     if(isUsed != YES)
         isUsed = YES;
     // Retrieve new posts as they are added to the database
@@ -290,8 +290,8 @@
         value = [command.arguments objectAtIndex:0];
     }
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
-    Firebase *myRootRef = [[Firebase alloc] initWithUrl:urlString];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    Firebase *myRootRef = [[Firebase alloc] initWithUrl:strURL];
     isUsed = YES;
     
     // Write data to Firebase
@@ -314,15 +314,15 @@
     //
     id value = nil;
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     
     if ( [command.arguments count] >= 2 )
     {
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
         value = [command.arguments objectAtIndex:1];
     }
-    //NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
-    Firebase *myChildRef = [[Firebase alloc] initWithUrl:urlString];
+    
+    Firebase *myChildRef = [[Firebase alloc] initWithUrl:strURL];
     isUsed = YES;
     
     // Write data to Firebase
@@ -345,15 +345,15 @@
     //
     id value = nil;
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     
     if ( [command.arguments count] >= 1 )
     {
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
         value = [command.arguments objectAtIndex:1];
     }
 
-    Firebase *myChildRef = [[Firebase alloc] initWithUrl:urlString];
+    Firebase *myChildRef = [[Firebase alloc] initWithUrl:strURL];
     Firebase *autoIDRef = [myChildRef childByAutoId];
     isUsed = YES;
     
@@ -387,8 +387,8 @@
     }
 
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
-    Firebase *myRootRef = [[Firebase alloc] initWithUrl:urlString];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    Firebase *myRootRef = [[Firebase alloc] initWithUrl:strURL];
     isUsed = YES;
     
     Firebase *childRef = [myRootRef childByAppendingPath:path];
@@ -404,13 +404,13 @@
 - (void)authWithCustomToken:(CDVInvokedUrlCommand*) command
 {
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     NSString *token = nil;
     if ( [command.arguments count] >= 1 )
     {
         token = [command.arguments objectAtIndex:0];
     }
-    Firebase *rootRef = [[Firebase alloc] initWithUrl:urlString];
+    Firebase *rootRef = [[Firebase alloc] initWithUrl:strURL];
     
     [rootRef authWithCustomToken:token withCompletionBlock:^( NSError *error , FAuthData *authData ){
         CDVPluginResult *result;
@@ -431,14 +431,14 @@
 - (void)onDisconnectSetValue:(CDVInvokedUrlCommand*) command
 {
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     id value = nil;
     if ( [command.arguments count] >= 2 )
     {
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
         value = [command.arguments objectAtIndex:1];
     }
-    Firebase *ulrRef = [[Firebase alloc] initWithUrl:urlString];
+    Firebase *ulrRef = [[Firebase alloc] initWithUrl:strURL];
     
     [ulrRef onDisconnectSetValue:value];
     
@@ -451,14 +451,14 @@
 - (void)onDisconnectSetValueWithCompletionBlock:(CDVInvokedUrlCommand*) command
 {
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     id value = nil;
     if ( [command.arguments count] >= 2 )
     {
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
         value = [command.arguments objectAtIndex:1];
     }
-    Firebase *ulrRef = [[Firebase alloc] initWithUrl:urlString];
+    Firebase *ulrRef = [[Firebase alloc] initWithUrl:strURL];
     
     [ulrRef onDisconnectSetValue:value withCompletionBlock:^( NSError *error , Firebase *ulrRef ){
         CDVPluginResult *result;
@@ -478,12 +478,12 @@
 - (void)onDisconnectRemoveValue:(CDVInvokedUrlCommand*) command
 {
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     if ( [command.arguments count] >= 1 )
     {
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
     }
-    Firebase *ulrRef = [[Firebase alloc] initWithUrl:urlString];
+    Firebase *ulrRef = [[Firebase alloc] initWithUrl:strURL];
     
     [ulrRef onDisconnectRemoveValue];
     
@@ -496,12 +496,12 @@
 - (void)onDisconnectRemoveValueWithCompletionBlock:(CDVInvokedUrlCommand*) command
 {
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     if ( [command.arguments count] >= 1 )
     {
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
     }
-    Firebase *ulrRef = [[Firebase alloc] initWithUrl:urlString];
+    Firebase *ulrRef = [[Firebase alloc] initWithUrl:strURL];
     
     [ulrRef onDisconnectRemoveValueWithCompletionBlock:^ ( NSError *error , Firebase *ref ){
         CDVPluginResult *result;
@@ -521,14 +521,14 @@
 - (void)onDisconnectUpdateChildValues:(CDVInvokedUrlCommand*) command
 {
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     NSDictionary *value = nil;
     if ( [command.arguments count] >= 2 )
     {
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
         value = [command.arguments objectAtIndex:1];
     }
-    Firebase *ulrRef = [[Firebase alloc] initWithUrl:urlString];
+    Firebase *ulrRef = [[Firebase alloc] initWithUrl:strURL];
     
     [ulrRef onDisconnectUpdateChildValues:value];
     CDVPluginResult *result;
@@ -539,14 +539,14 @@
 - (void)onDisconnectUpdateChildValuesWithCompletionBlock: (CDVInvokedUrlCommand*) command
 {
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     NSDictionary *value = nil;
     if ( [command.arguments count] >= 2 )
     {
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
         value = [command.arguments objectAtIndex:1];
     }
-    Firebase *ulrRef = [[Firebase alloc] initWithUrl:urlString];
+    Firebase *ulrRef = [[Firebase alloc] initWithUrl:strURL];
     
     [ulrRef onDisconnectUpdateChildValues:value withCompletionBlock:^( NSError *error , Firebase *ref ){
         CDVPluginResult *result;
@@ -565,12 +565,12 @@
 - (void)cancelDisconnectOperations:(CDVInvokedUrlCommand*) command
 {
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     if ( [command.arguments count] >= 1 )
     {
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
     }
-    Firebase *ulrRef = [[Firebase alloc] initWithUrl:urlString];
+    Firebase *ulrRef = [[Firebase alloc] initWithUrl:strURL];
     
     [ulrRef cancelDisconnectOperations];
     CDVPluginResult *result;
@@ -582,14 +582,14 @@
 - (void)cancelDisconnectOperationsWithCompletionBlock:(CDVInvokedUrlCommand*) command
 {
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     if ( [command.arguments count] >= 1 )
     {
-        urlString = [command.arguments objectAtIndex:0];
+        strURL = [command.arguments objectAtIndex:0];
     }
-    Firebase *ulrRef = [[Firebase alloc] initWithUrl:urlString];
+    Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
     
-    [ulrRef cancelDisconnectOperationsWithCompletionBlock:^( NSError *error , Firebase *ref ){
+    [urlRef cancelDisconnectOperationsWithCompletionBlock:^( NSError *error , Firebase *ref ){
         CDVPluginResult *result;
         if (error) {
             // Error
@@ -604,11 +604,360 @@
     }];
 }
 
+//----  Querying and limiting
+
+// Query Limite to Number of children
+- (void)queryLimitedToNumberOfChildren:(CDVInvokedUrlCommand*) command
+{
+    //
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSInteger limit = 0;
+    
+    if ( [command.arguments count] >= 2 )
+    {
+        strURL = [command.arguments objectAtIndex:0];
+        limit = [command.arguments objectAtIndex:1];
+    }
+    Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
+    FQuery *queryObj = [urlRef queryLimitedToNumberOfChildren:limit];
+    //NSDictionary *resultDict = nil;
+    
+    [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
+        NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
+        NSDictionary *resultDict = snapshot.value;
+        
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } withCancelBlock:^(NSError *error){
+        NSLog(@"%@", error.description);
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+//Qeury Limite to First
+- (void)queryLimitedToFirst:(CDVInvokedUrlCommand*) command
+{
+    //
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSInteger limit = 0;
+    
+    if ( [command.arguments count] >= 2 )
+    {
+        strURL = [command.arguments objectAtIndex:0];
+        limit = [command.arguments objectAtIndex:1];
+    }
+    Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
+    FQuery *queryObj = [urlRef queryLimitedToFirst:limit];
+    //NSDictionary *resultDict = nil;
+    
+    [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
+        NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
+        NSDictionary *resultDict = snapshot.value;
+        
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } withCancelBlock:^(NSError *error){
+        NSLog(@"%@", error.description);
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+//Qeury Limite to Last
+- (void)queryLimitedToLast:(CDVInvokedUrlCommand*) command
+{
+    //
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSInteger limit = 0;
+    
+    if ( [command.arguments count] >= 2 )
+    {
+        strURL = [command.arguments objectAtIndex:0];
+        limit = [command.arguments objectAtIndex:1];
+    }
+    Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
+    FQuery *queryObj = [urlRef queryLimitedToLast:limit];
+    //NSDictionary *resultDict = nil;
+    
+    [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
+        NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
+        NSDictionary *resultDict = snapshot.value;
+        
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } withCancelBlock:^(NSError *error){
+        NSLog(@"%@", error.description);
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+//Qeury Order By Child
+- (void)queryOrderedByChild:(CDVInvokedUrlCommand*) command
+{
+    //
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strChild;
+    
+    if ( [command.arguments count] >= 2 )
+    {
+        strURL = [command.arguments objectAtIndex:0];
+        strChild = [command.arguments objectAtIndex:1];
+    }
+    Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
+    FQuery *queryObj = [urlRef queryOrderedByChild:strChild];
+    //NSDictionary *resultDict = nil;
+    
+    [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
+        NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
+        NSDictionary *resultDict = snapshot.value;
+        
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } withCancelBlock:^(NSError *error){
+        NSLog(@"%@", error.description);
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+//Qeury Order By Key
+- (void)queryOrderedByKey:(CDVInvokedUrlCommand*) command
+{
+    //
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strKey = nil;
+    
+    if ( [command.arguments count] >= 2 )
+    {
+        strURL = [command.arguments objectAtIndex:0];
+        strKey = [command.arguments objectAtIndex:1];
+    }
+    Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
+    FQuery *queryObj = [urlRef queryOrderedByChild:strKey];
+    //NSDictionary *resultDict = nil;
+    
+    [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
+        NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
+        NSDictionary *resultDict = snapshot.value;
+        
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } withCancelBlock:^(NSError *error){
+        NSLog(@"%@", error.description);
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+//Qeury Starting At Value
+- (void)queryStartingAtValue:(CDVInvokedUrlCommand*) command
+{
+    //
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    id idStartValue;
+    
+    if ( [command.arguments count] >= 2 )
+    {
+        strURL = [command.arguments objectAtIndex:0];
+        idStartValue = [command.arguments objectAtIndex:1];
+    }
+    Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
+    FQuery *queryObj = [urlRef queryStartingAtValue:idStartValue];
+    //NSDictionary *resultDict = nil;
+    
+    [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
+        NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
+        NSDictionary *resultDict = snapshot.value;
+        
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } withCancelBlock:^(NSError *error){
+        NSLog(@"%@", error.description);
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+//Qeury Starting At Value With Child Key
+- (void)queryStartingAtValueChildKey:(CDVInvokedUrlCommand*) command
+{
+    //
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    id idStartValue;
+    NSString *strChildKey = nil;
+    
+    if ( [command.arguments count] >= 3 )
+    {
+        strURL = [command.arguments objectAtIndex:0];
+        idStartValue = [command.arguments objectAtIndex:1];
+        strChildKey = [command.arguments objectAtIndex:2];
+    }
+    Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
+    FQuery *queryObj = [urlRef queryStartingAtValue:idStartValue childKey:strChildKey];
+    //NSDictionary *resultDict = nil;
+    
+    [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
+        NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
+        NSDictionary *resultDict = snapshot.value;
+        
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } withCancelBlock:^(NSError *error){
+        NSLog(@"%@", error.description);
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+//Qeury Ending At Value
+- (void)queryEndingAtValue:(CDVInvokedUrlCommand*) command
+{
+    //
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    id idEndValue;
+    
+    if ( [command.arguments count] >= 2 )
+    {
+        strURL = [command.arguments objectAtIndex:0];
+        idEndValue = [command.arguments objectAtIndex:1];
+    }
+    Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
+    FQuery *queryObj = [urlRef queryEndingAtValue:idEndValue];
+    //NSDictionary *resultDict = nil;
+    
+    [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
+        NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
+        NSDictionary *resultDict = snapshot.value;
+        
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } withCancelBlock:^(NSError *error){
+        NSLog(@"%@", error.description);
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+//Qeury Ending At Value With Child Key
+- (void)queryEndingAtValueChildKey:(CDVInvokedUrlCommand*) command
+{
+    //
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    id idEndValue;
+    NSString *strChildKey = nil;
+    
+    if ( [command.arguments count] >= 3 )
+    {
+        strURL = [command.arguments objectAtIndex:0];
+        idEndValue = [command.arguments objectAtIndex:1];
+        strChildKey = [command.arguments objectAtIndex:2];
+    }
+    Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
+    FQuery *queryObj = [urlRef queryStartingAtValue:idEndValue childKey:strChildKey];
+    //NSDictionary *resultDict = nil;
+    
+    [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
+        NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
+        NSDictionary *resultDict = snapshot.value;
+        
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } withCancelBlock:^(NSError *error){
+        NSLog(@"%@", error.description);
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+//Qeury Equal to Value
+- (void)queryEqualToValue:(CDVInvokedUrlCommand*) command
+{
+    //
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    id idValue;
+    
+    if ( [command.arguments count] >= 2 )
+    {
+        strURL = [command.arguments objectAtIndex:0];
+        idValue = [command.arguments objectAtIndex:1];
+    }
+    Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
+    FQuery *queryObj = [urlRef queryEqualToValue:idValue];
+    //NSDictionary *resultDict = nil;
+    
+    [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
+        NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
+        NSDictionary *resultDict = snapshot.value;
+        
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } withCancelBlock:^(NSError *error){
+        NSLog(@"%@", error.description);
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+//Qeury Equal to Value with Child Key
+- (void)queryEqualToValueChildKey:(CDVInvokedUrlCommand*) command
+{
+    //
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    id idValue;
+    NSString *strChildKey = nil;
+    
+    if ( [command.arguments count] >= 3 )
+    {
+        strURL = [command.arguments objectAtIndex:0];
+        idValue = [command.arguments objectAtIndex:1];
+        strChildKey = [command.arguments objectAtIndex:2];
+    }
+    Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
+    FQuery *queryObj = [urlRef queryEqualToValue:idValue childKey:strChildKey];
+    //NSDictionary *resultDict = nil;
+    
+    [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
+        NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
+        NSDictionary *resultDict = snapshot.value;
+        
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } withCancelBlock:^(NSError *error){
+        NSLog(@"%@", error.description);
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
 //User Log in
 - (void)userLogin:(CDVInvokedUrlCommand *)command{
     
     // Create a reference to a Firebase database URL
-    NSString *urlString = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
     NSString *userName = nil;
     NSString *password = nil;
     
@@ -617,7 +966,7 @@
         userName = [command.arguments objectAtIndex:0];
         password = [command.arguments objectAtIndex:1];
     }
-    Firebase *rootRef = [[Firebase alloc] initWithUrl:urlString];
+    Firebase *rootRef = [[Firebase alloc] initWithUrl:strURL];
     [rootRef authUser:userName password:password withCompletionBlock:^(NSError *error, FAuthData *authData) {
         CDVPluginResult *result;
         if (error) {

@@ -58,13 +58,36 @@
 - (void)onDisconnectUpdateChildValues:(CDVInvokedUrlCommand*) command;
 
 - (void)onDisconnectUpdateChildValuesWithCompletionBlock:(CDVInvokedUrlCommand*) command;
+
 - (void)cancelDisconnectOperations:(CDVInvokedUrlCommand*) command;
 
 - (void)cancelDisconnectOperationsWithCompletionBlock:(CDVInvokedUrlCommand*) command;
 
 //----  Querying and limiting
 
-//User Login
+- (void)queryLimitedToNumberOfChildren:(CDVInvokedUrlCommand*) command;
+
+- (void)queryLimitedToFirst:(CDVInvokedUrlCommand*) command;
+
+- (void)queryLimitedToLast:(CDVInvokedUrlCommand*) command;
+
+- (void)queryOrderedByChild:(CDVInvokedUrlCommand*) command;
+
+- (void)queryOrderedByKey:(CDVInvokedUrlCommand*) command;
+
+- (void)queryStartingAtValue:(CDVInvokedUrlCommand*) command;
+
+- (void)queryStartingAtValueChildKey:(CDVInvokedUrlCommand*) command;
+
+- (void)queryEndingAtValue:(CDVInvokedUrlCommand*) command;
+
+- (void)queryEndingAtValueChildKey:(CDVInvokedUrlCommand*) command;
+
+- (void)queryEqualToValue:(CDVInvokedUrlCommand*) command;
+
+- (void)queryEqualToValueChildKey:(CDVInvokedUrlCommand*) command;
+
+    //User Login
 - (void)userLogin: (CDVInvokedUrlCommand*) command;
 
 //- (void)createUser:(CDVInvokedUrlCommand*)command;

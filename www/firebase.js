@@ -253,7 +253,7 @@ FireBase.prototype.writeValueToURL = function (url, object, successCallback, err
         return;
     }
 
-    exec(successCallback, errorCallback, 'FireBase', 'writeValueToURL', [url], [object]);
+    exec(successCallback, errorCallback, 'FireBase', 'writeValueToURL', [url, object]);
 };
 
 //-------------------------------------------------------------------
@@ -273,7 +273,7 @@ FireBase.prototype.childSet = function (path, object, successCallback, errorCall
         return;
     }
 
-    exec(successCallback, errorCallback, 'FireBase', 'childSet', [path], [object]);
+    exec(successCallback, errorCallback, 'FireBase', 'childSet', [path, object]);
 };
 
 //-------------------------------------------------------------------
@@ -313,7 +313,7 @@ FireBase.prototype.onDisconnectSetValue = function (url, object, successCallback
         return;
     }
 
-    exec(successCallback, errorCallback, 'FireBase', 'onDisconnectSetValue', [url], [object]);
+    exec(successCallback, errorCallback, 'FireBase', 'onDisconnectSetValue', [url, object]);
 };
 
 //-------------------------------------------------------------------
@@ -333,7 +333,7 @@ FireBase.prototype.onDisconnectSetValueWithCompletionBlock = function (url, obje
         return;
     }
 
-    exec(successCallback, errorCallback, 'FireBase', 'onDisconnectSetValueWithCompletionBlock', [url], [object]);
+    exec(successCallback, errorCallback, 'FireBase', 'onDisconnectSetValueWithCompletionBlock', [url, object]);
 };
 
 //-------------------------------------------------------------------
@@ -393,7 +393,7 @@ FireBase.prototype.onDisconnectUpdateChildValues = function (url, valueDictionar
         return;
     }
 
-    exec(successCallback, errorCallback, 'FireBase', 'onDisconnectUpdateChildValues', [url], [valueDictionary]);
+    exec(successCallback, errorCallback, 'FireBase', 'onDisconnectUpdateChildValues', [url]);
 };
 
 //-------------------------------------------------------------------
@@ -413,7 +413,7 @@ FireBase.prototype.onDisconnectUpdateChildValuesWithCompletionBlock = function (
         return;
     }
 
-    exec(successCallback, errorCallback, 'FireBase', 'onDisconnectUpdateChildValuesWithCompletionBlock', [url], [valueDictionary]);
+    exec(successCallback, errorCallback, 'FireBase', 'onDisconnectUpdateChildValuesWithCompletionBlock', [url, valueDictionary]);
 };
 
 //-------------------------------------------------------------------
@@ -454,6 +454,267 @@ FireBase.prototype.cancelDisconnectOperationsWithCompletionBlock = function (url
     }
 
     exec(successCallback, errorCallback, 'FireBase', 'cancelDisconnectOperationsWithCompletionBlock', [url]);
+};
+
+//-------------------------------------------------------------------
+FireBase.prototype.queryLimitedToNumberOfChildren = function (intLimit, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.queryLimitedToNumberOfChildren failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.queryLimitedToNumberOfChildren failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'queryLimitedToNumberOfChildren', [intLimit]);
+};
+
+//-------------------------------------------------------------------
+FireBase.prototype.queryLimitedToNumberOfChildren = function (strURL, intLimit, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.queryLimitedToNumberOfChildren failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.queryLimitedToNumberOfChildren failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'queryLimitedToNumberOfChildren', [strURL, intLimit]);
+};
+
+//-------------------------------------------------------------------
+FireBase.prototype.queryLimitedToFirst = function (strURL, intLimit, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.queryLimitedToFirst failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.queryLimitedToFirst failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'queryLimitedToFirst', [strURL, intLimit]);
+};
+
+//-------------------------------------------------------------------
+FireBase.prototype.queryLimitedToLast = function (strURL, intLimit, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.queryLimitedToLast failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.queryLimitedToLast failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'queryLimitedToLast', [strURL, intLimit]);
+};
+
+//-------------------------------------------------------------------
+FireBase.prototype.queryOrderedByChild = function (strURL, strChild, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.queryOrderedByChild failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.queryOrderedByChild failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'queryOrderedByChild', [strURL, strChild]);
+};
+
+//-------------------------------------------------------------------
+FireBase.prototype.queryOrderedByKey = function (strURL, strKey, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.queryOrderedByKey failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.queryOrderedByKey failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'queryOrderedByKey', [strURL, strKey]);
+};
+
+//-------------------------------------------------------------------
+FireBase.prototype.queryStartingAtValue = function (strURL, idStartValue, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.queryStartingAtValue failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.queryStartingAtValue failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'queryStartingAtValue', [strURL], [idStartValue]);
+};
+
+//-------------------------------------------------------------------
+FireBase.prototype.queryStartingAtValueChildKey = function (strURL, idStartValue, strChildKey, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.queryStartingAtValueChildKey failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.queryStartingAtValueChildKey failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'queryStartingAtValueChildKey', [strURL, idStartValue, strChildKey]);
+};
+
+//-------------------------------------------------------------------
+FireBase.prototype.queryEndingAtValue = function (strURL, idEndValue, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.queryEndingAtValue failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.queryEndingAtValue failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'queryEndingAtValue', [strURL, idEndValue]);
+};
+
+//-------------------------------------------------------------------
+FireBase.prototype.queryEndingAtValueChildKey = function (strURL, idEndValue, strChildKey, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.queryEndingAtValueChildKey failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.queryEndingAtValueChildKey failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'queryEndingAtValueChildKey', [strURL, idEndValue, strChildKey]);
+};
+
+//-------------------------------------------------------------------
+FireBase.prototype.queryEqualToValue = function (strURL, idValue, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.queryEqualToValue failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.queryEqualToValue failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'queryEqualToValue', [strURL, idValue]);
+};
+
+//-------------------------------------------------------------------
+FireBase.prototype.queryEqualToValueChildKey = function (strURL, idValue, strChildKey, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.queryEqualToValueChildKey failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.queryEqualToValueChildKey failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'queryEqualToValueChildKey', [strURL, idValue, strChildKey]);
+};
+
+
+//-------------------------------------------------------------------
+FireBase.prototype.userLogin = function (strUserName, strPassword, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.userLogin failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.userLogin failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'userLogin', [strUserName, strPassword]);
 };
 
 
