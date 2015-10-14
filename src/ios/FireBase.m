@@ -735,15 +735,13 @@
 {
     //
     NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
-    NSString *strKey = nil;
     
-    if ( [command.arguments count] >= 2 )
+    if ( [command.arguments count] >= 1 )
     {
         strURL = [command.arguments objectAtIndex:0];
-        strKey = [command.arguments objectAtIndex:1];
     }
     Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
-    FQuery *queryObj = [urlRef queryOrderedByChild:strKey];
+    FQuery *queryObj = [urlRef queryOrderedByKey];
     //NSDictionary *resultDict = nil;
     
     [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
@@ -937,6 +935,186 @@
     Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
     FQuery *queryObj = [urlRef queryEqualToValue:idValue childKey:strChildKey];
     //NSDictionary *resultDict = nil;
+    
+    [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
+        NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
+        NSDictionary *resultDict = snapshot.value;
+        
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } withCancelBlock:^(NSError *error){
+        NSLog(@"%@", error.description);
+        CDVPluginResult *result;
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+//Qeury Search with combination of order, limit, equalTo/startAt/endAt
+/*-------------------------------------------------------------------
+ * querySearch: is used to generate a Dictionary reference to a limited, ordered view of the data at selected location.
+ * The Dictionary reference returned by querySearch: will respond to events as node with a value
+ * equal to / starting at / ending at the suplied argument with a key equal to / starting at / ending at childKey.
+ *
+ * @param strURL - The full url string for Firebase database
+ * @param queryInfo - A dictionary instance of Query.
+ * @return  - A Dictionary instance, limited to / ordered by data with the supplied values and the keys.
+ *
+ * @variable typeofSearch -
+ *                       0: QSearchAt_EQUAL = 0,
+ *                       1: QSearchAt_STARTING,
+ *                       2: QSearchAt_ENDING
+ * @variable searchValue - The lower bound, inclusive, for the value of data visible to the returned FQuery
+ * @variable strSearchKey -  The lower bound, inclusive, for the key of nodes with value equal to idSearchValue
+ *                       If strSearchKey is nil or no length, use queryEqualToValue:/queryStartingAt:/queryEndingAt:
+ *                       if not, use queryEqualToValue:childKey:/queryStartingAt:childKey:/queryEndingAt:childKey:
+ * @variable typeofOrder -
+ *                       0: QOrderBy_NOT = 0,
+ *                       1: QOrderBy_CHILDKEY
+ *                       2: QOrderBy_CHILDVALUE
+ * @variable strOrderValue - The child value to use in ordering data visible to the returned Dictionary
+ * @variable typeofLimit -
+ *                       0: QLimitedTo_NOT = 0,
+ *                       1: QLimitedTo_FIRST,
+ *                       2: QLimitedTo_LAST
+ * @variable numLimited - The upper bound, inclusive, for the number of child nodes to receive events for
+ */
+- (void)querySearch:(CDVInvokedUrlCommand*) command
+{
+    //
+    NSString *strURL = [NSString stringWithFormat:@"https://%@.firebaseio.com", appName];
+    NSDictionary *queryInfo;
+    
+    NSInteger typeofSearch = 0;
+    id searchValue;
+    NSString *strSearchKey = nil;
+    NSInteger typeofOrder = 0;
+    NSString *strOrderValue = nil;
+    NSInteger typeofLimit = 0;
+    NSInteger numLimited = 0;
+    
+   // NSString *temp;
+    if ( [command.arguments count] >= 2 )
+    {
+        strURL = [command.arguments objectAtIndex:0];
+        queryInfo = [command.arguments objectAtIndex:1];
+        {
+            if ((NSString*)[queryInfo objectForKey:@"search"] == nil){
+                typeofSearch = QSearchAt_STARTING;
+                searchValue = @"";
+                strSearchKey = @"";
+            }
+            else {
+                if ([(NSString*)[[queryInfo objectForKey:@"search"] objectForKey:@"type"]  isEqual: @"starting"])
+                    typeofSearch = QSearchAt_STARTING;
+                else if ([(NSString*)[[queryInfo objectForKey:@"search"] objectForKey:@"type"]  isEqual: @"ending"])
+                    typeofSearch = QSearchAt_ENDING;
+                else    //"equal" or nil
+                    typeofSearch = QSearchAt_EQUAL;
+
+                searchValue = (NSString*)[[queryInfo objectForKey:@"search"] objectForKey:@"value"];
+                if (searchValue == nil)
+                    searchValue = @"";
+                
+                strSearchKey = (NSString*)[[queryInfo objectForKey:@"search"] objectForKey:@"child"];
+                if (strSearchKey == nil)
+                    strSearchKey = @"";
+            }
+            
+            if ((NSString*)[queryInfo objectForKey:@"order"] == nil){
+                typeofOrder = QOrderBy_NOT;
+                strOrderValue = @"";
+            }
+            else {
+                if ([(NSString*)[[queryInfo objectForKey:@"order"] objectForKey:@"by"]  isEqual: @"key"] )
+                    typeofOrder = QOrderBy_CHILDKEY;
+                else if ([(NSString*)[[queryInfo objectForKey:@"order"] objectForKey:@"by"]  isEqual: @"value"])
+                    typeofOrder = QOrderBy_CHILDVALUE;
+                else
+                    typeofOrder = QOrderBy_NOT;
+                
+                strOrderValue = (NSString*)[[queryInfo objectForKey:@"order"] objectForKey:@"field"];
+                if (strOrderValue == nil)
+                    strOrderValue = @"";
+            }
+            
+            if ([queryInfo objectForKey:@"limit"] == nil) {
+                typeofLimit = QLimitedTo_NOT;
+                numLimited = 0;
+            }
+            else{
+                if ([(NSString*)[[queryInfo objectForKey:@"limit"] objectForKey:@"at"]  isEqual: @"first"] )
+                    typeofLimit = QLimitedTo_FIRST;
+                else if ([(NSString*)[[queryInfo objectForKey:@"limit"] objectForKey:@"at"]  isEqual: @"last"])
+                    typeofLimit = QLimitedTo_LAST;
+                else
+                    typeofLimit = QLimitedTo_NOT;
+                
+                if ([[queryInfo objectForKey:@"limit"] objectForKey:@"num"] == nil)
+                    numLimited = 0;
+                else
+                    numLimited = [[[queryInfo objectForKey:@"limit"] objectForKey:@"num"] integerValue];
+            }
+        }
+    }
+    
+    Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
+    FQuery *queryObj = nil;
+    
+    switch (typeofSearch) {
+        case QSearchAt_EQUAL:
+            if(strSearchKey == nil | strSearchKey.length == 0)
+                queryObj = [urlRef queryEqualToValue:searchValue];
+            else
+                queryObj = [urlRef queryEqualToValue:searchValue childKey:strSearchKey];
+            break;
+            
+        case QSearchAt_STARTING:
+            if(strSearchKey == nil | strSearchKey.length == 0)
+                queryObj = [urlRef queryStartingAtValue:searchValue];
+            else
+                queryObj = [urlRef queryStartingAtValue:searchValue childKey:strSearchKey];
+            break;
+            
+        case QSearchAt_ENDING:
+            if(strSearchKey == nil | strSearchKey.length == 0)
+                queryObj = [urlRef queryEndingAtValue:searchValue];
+            else
+                queryObj = [urlRef queryEndingAtValue:searchValue childKey:strSearchKey];
+            break;
+            
+        default:
+            queryObj = [urlRef queryStartingAtValue:nil];
+            break;
+    }
+    
+    switch (typeofOrder) {
+        case QOrderBy_NOT:
+        default:
+            break;
+            
+        case QOrderBy_CHILDKEY:
+            queryObj = [queryObj queryOrderedByKey];
+            break;
+            
+        case QOrderBy_CHILDVALUE:
+            queryObj = [queryObj queryOrderedByChild:strOrderValue];
+            break;
+    }
+    
+    switch (typeofLimit) {
+        case QLimitedTo_NOT:
+        default:
+            
+            break;
+        case QLimitedTo_FIRST:
+            queryObj = [queryObj queryLimitedToFirst:numLimited];
+            break;
+        case QLimitedTo_LAST:
+            queryObj = [queryObj queryLimitedToLast:numLimited];
+        break;
+    }
     
     [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
         NSLog(@"%@ -> %@", snapshot.key, snapshot.value);

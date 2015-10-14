@@ -557,7 +557,7 @@ FireBase.prototype.queryOrderedByChild = function (strURL, strChild, successCall
 };
 
 //-------------------------------------------------------------------
-FireBase.prototype.queryOrderedByKey = function (strURL, strKey, successCallback, errorCallback) {
+FireBase.prototype.queryOrderedByKey = function (strURL, successCallback, errorCallback) {
     if (errorCallback == null) {
         errorCallback = function () {
         };
@@ -573,7 +573,7 @@ FireBase.prototype.queryOrderedByKey = function (strURL, strKey, successCallback
         return;
     }
 
-    exec(successCallback, errorCallback, 'FireBase', 'queryOrderedByKey', [strURL, strKey]);
+    exec(successCallback, errorCallback, 'FireBase', 'queryOrderedByKey', [strURL]);
 };
 
 //-------------------------------------------------------------------
@@ -694,6 +694,51 @@ FireBase.prototype.queryEqualToValueChildKey = function (strURL, idValue, strChi
     }
 
     exec(successCallback, errorCallback, 'FireBase', 'queryEqualToValueChildKey', [strURL, idValue, strChildKey]);
+};
+
+/*-------------------------------------------------------------------
+* querySearch: is used to generate a Dictionary reference to a limited, ordered view of the data at selected location.
+* The Dictionary reference returned by querySearch: will respond to events as node with a value 
+* equal to / starting at / ending at the suplied argument with a key equal to / starting at / ending at childKey.
+* 
+* @param strURL - The full url string for Firebase database
+* @param queryInfo - A dictionary instance of Query.
+* @return  - A Dictionary instance, limited to / ordered by data with the supplied values and the keys.
+*
+* ex:
+*       queryInfo = {
+*           search: {
+*               type: 'starting',   //'starting', 'ending' 'equal' or nil
+*               value: 'fjsj',      // object
+*               child: 'child-1'    // string   //if this key is nil or empty, doesn't use.
+*           },
+*           order: {            // if this key is nil, not order 
+*               by: 'key',          // 'key', 'value' or nil
+*               field: 'name'       // if key "by" is 'value', use this key but if not, doesn't use.
+*           },
+*           limit: {            // if this key is nil, no limit.
+*               at: 'first',        //'first', last' or nil
+*               num: 10             //integer
+*           }
+*       };
+*/
+FireBase.prototype.querySearch = function (strURL, queryInfo, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.querySearch failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.querySearch failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'querySearch', [strURL, queryInfo]);
 };
 
 

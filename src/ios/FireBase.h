@@ -65,6 +65,24 @@
 
 //----  Querying and limiting
 
+typedef enum {
+    QSearchAt_EQUAL = 0,
+    QSearchAt_STARTING,
+    QSearchAt_ENDING
+} QSearchType;
+
+typedef enum {
+    QOrderBy_NOT = 0,
+    QOrderBy_CHILDKEY,
+    QOrderBy_CHILDVALUE
+} QOrderType;
+
+typedef enum {
+    QLimitedTo_NOT = 0,
+    QLimitedTo_FIRST,
+    QLimitedTo_LAST
+} QLimitType;
+
 - (void)queryLimitedToNumberOfChildren:(CDVInvokedUrlCommand*) command;
 
 - (void)queryLimitedToFirst:(CDVInvokedUrlCommand*) command;
@@ -86,6 +104,8 @@
 - (void)queryEqualToValue:(CDVInvokedUrlCommand*) command;
 
 - (void)queryEqualToValueChildKey:(CDVInvokedUrlCommand*) command;
+
+- (void)querySearch:(CDVInvokedUrlCommand*) command;
 
     //User Login
 - (void)userLogin: (CDVInvokedUrlCommand*) command;
