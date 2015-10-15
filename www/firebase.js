@@ -707,14 +707,14 @@ FireBase.prototype.queryEqualToValueChildKey = function (strURL, idValue, strChi
 *
 * ex:
 *       queryInfo = {
-*           search: {
-*               type: 'starting',   //'starting', 'ending' 'equal' or nil
-*               value: 'fjsj',      // object
-*               child: 'child-1'    // string   //if this key is nil or empty, doesn't use.
-*           },
 *           order: {            // if this key is nil, not order 
-*               by: 'key',          // 'key', 'value' or nil
-*               field: 'name'       // if key "by" is 'value', use this key but if not, doesn't use.
+*               by: 'value',          // 'key', 'value' or nil
+*               field: 'height'       // if the key "by" is 'key', doesn't use this key but if not, use.
+*           },
+*           search: {           
+*               type: 'starting',   //'starting', 'ending' 'equal' or nil
+*               value: 3,           // object
+*               child: ''           // string   //if this key is nil or empty, doesn't use.
 *           },
 *           limit: {            // if this key is nil, no limit.
 *               at: 'first',        //'first', last' or nil

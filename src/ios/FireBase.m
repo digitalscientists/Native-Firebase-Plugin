@@ -951,7 +951,7 @@
     }];
 }
 
-//Qeury Search with combination of order, limit, equalTo/startAt/endAt
+//Qeury Search with combination of order, equalTo/startAt/endAt, limit
 /*-------------------------------------------------------------------
  * querySearch: is used to generate a Dictionary reference to a limited, ordered view of the data at selected location.
  * The Dictionary reference returned by querySearch: will respond to events as node with a value
@@ -961,6 +961,11 @@
  * @param queryInfo - A dictionary instance of Query.
  * @return  - A Dictionary instance, limited to / ordered by data with the supplied values and the keys.
  *
+ * @variable typeofOrder -
+ *                       0: QOrderBy_NOT = 0,
+ *                       1: QOrderBy_CHILDKEY
+ *                       2: QOrderBy_CHILDVALUE
+ * @variable strOrderValue - The child value to use in ordering data visible to the returned Dictionary
  * @variable typeofSearch -
  *                       0: QSearchAt_EQUAL = 0,
  *                       1: QSearchAt_STARTING,
@@ -969,11 +974,6 @@
  * @variable strSearchKey -  The lower bound, inclusive, for the key of nodes with value equal to idSearchValue
  *                       If strSearchKey is nil or no length, use queryEqualToValue:/queryStartingAt:/queryEndingAt:
  *                       if not, use queryEqualToValue:childKey:/queryStartingAt:childKey:/queryEndingAt:childKey:
- * @variable typeofOrder -
- *                       0: QOrderBy_NOT = 0,
- *                       1: QOrderBy_CHILDKEY
- *                       2: QOrderBy_CHILDVALUE
- * @variable strOrderValue - The child value to use in ordering data visible to the returned Dictionary
  * @variable typeofLimit -
  *                       0: QLimitedTo_NOT = 0,
  *                       1: QLimitedTo_FIRST,
@@ -1060,63 +1060,63 @@
     }
     
     Firebase *urlRef = [[Firebase alloc] initWithUrl:strURL];
+    
+    FQuery *queryOrder = nil;
+    switch (typeofOrder) {
+        case QOrderBy_NOT:	
+        default:
+        case QOrderBy_CHILDKEY:
+            queryOrder = [urlRef queryOrderedByKey];
+            break;
+            
+        case QOrderBy_CHILDVALUE:
+            queryOrder = [urlRef queryOrderedByChild:strOrderValue];
+            break;
+    }
+
     FQuery *queryObj = nil;
     
     switch (typeofSearch) {
         case QSearchAt_EQUAL:
             if(strSearchKey == nil | strSearchKey.length == 0)
-                queryObj = [urlRef queryEqualToValue:searchValue];
+                queryObj = [queryOrder queryEqualToValue:searchValue];
             else
-                queryObj = [urlRef queryEqualToValue:searchValue childKey:strSearchKey];
+                queryObj = [queryOrder queryEqualToValue:searchValue childKey:strSearchKey];
             break;
             
         case QSearchAt_STARTING:
             if(strSearchKey == nil | strSearchKey.length == 0)
-                queryObj = [urlRef queryStartingAtValue:searchValue];
+                queryObj = [queryOrder queryStartingAtValue:searchValue];
             else
-                queryObj = [urlRef queryStartingAtValue:searchValue childKey:strSearchKey];
+                queryObj = [queryOrder queryStartingAtValue:searchValue childKey:strSearchKey];
             break;
             
         case QSearchAt_ENDING:
             if(strSearchKey == nil | strSearchKey.length == 0)
-                queryObj = [urlRef queryEndingAtValue:searchValue];
+                queryObj = [queryOrder queryEndingAtValue:searchValue];
             else
-                queryObj = [urlRef queryEndingAtValue:searchValue childKey:strSearchKey];
+                queryObj = [queryOrder queryEndingAtValue:searchValue childKey:strSearchKey];
             break;
             
         default:
-            queryObj = [urlRef queryStartingAtValue:nil];
+            queryObj = [queryOrder queryStartingAtValue:nil];
             break;
     }
-    
-    switch (typeofOrder) {
-        case QOrderBy_NOT:
-        default:
-            break;
-            
-        case QOrderBy_CHILDKEY:
-            queryObj = [queryObj queryOrderedByKey];
-            break;
-            
-        case QOrderBy_CHILDVALUE:
-            queryObj = [queryObj queryOrderedByChild:strOrderValue];
-            break;
-    }
-    
+    FQuery *queryLimit = nil;
     switch (typeofLimit) {
         case QLimitedTo_NOT:
         default:
-            
+            queryLimit = queryObj;
             break;
         case QLimitedTo_FIRST:
-            queryObj = [queryObj queryLimitedToFirst:numLimited];
+            queryLimit = [queryObj queryLimitedToFirst:numLimited];
             break;
         case QLimitedTo_LAST:
-            queryObj = [queryObj queryLimitedToLast:numLimited];
+            queryLimit = [queryObj queryLimitedToLast:numLimited];
         break;
     }
     
-    [queryObj observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
+    [queryLimit observeSingleEventOfType:FEventTypeValue withBlock:^(FDataSnapshot *snapshot) {
         NSLog(@"%@ -> %@", snapshot.key, snapshot.value);
         NSDictionary *resultDict = snapshot.value;
         
