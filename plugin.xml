@@ -9,8 +9,8 @@
     <author>LSH</author>
     <keywords>Phonegap, Firebase, Disk Persistensy, iOS</keywords>
 
-    <repo>https://github.com/ersin88888/FirebasePlugin.git</repo>
-    <issue>https://github.com/ersin88888/FirebasePlugin/issues</issue>
+    <repo>https://github.com/HelloCrowd/Native-Firebase-Plugin.git</repo>
+    <issue>https://github.com/HelloCrowd/Native-Firebase-Plugin/issues</issue>
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
