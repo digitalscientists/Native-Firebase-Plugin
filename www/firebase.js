@@ -762,6 +762,25 @@ FireBase.prototype.userLogin = function (strUserName, strPassword, successCallba
     exec(successCallback, errorCallback, 'FireBase', 'userLogin', [strUserName, strPassword]);
 };
 
+FireBase.prototype.writeValueToURLWithAutoID = function (strURL, queryInfo, successCallback, errorCallback) {
+    if (errorCallback == null) {
+        errorCallback = function () {
+        };
+    }
+
+    if (typeof errorCallback != "function") {
+        console.log("FireBase.writeValueToURLWithAutoID failure: failure parameter not a function");
+        return;
+    }
+
+    if (typeof successCallback != "function") {
+        console.log("FireBase.writeValueToURLWithAutoID failure: success callback parameter must be a function");
+        return;
+    }
+
+    exec(successCallback, errorCallback, 'FireBase', 'writeValueToURLWithAutoID', [strURL, queryInfo]);
+};
+
 
 var fireBase = new FireBase();
 module.exports = fireBase;
