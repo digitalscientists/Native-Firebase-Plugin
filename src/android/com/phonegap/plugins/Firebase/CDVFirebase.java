@@ -17,11 +17,13 @@
 
 package com.phonegap.plugins.Firebase;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.firebase.client.AuthData;
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.Query;
+import com.firebase.client.ValueEventListener;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -31,13 +33,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.firebase.client.AuthData;
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.Query;
-import com.firebase.client.ValueEventListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 //import android.app.Activity;
 //import android.content.Intent;
@@ -49,7 +49,7 @@ public class CDVFirebase extends CordovaPlugin {
 	//public static final int REQUEST_CODE = 0x0abbc0de;
 	public static boolean isUsed = false;
 	public static String appName = "";
-	
+
 //    public static final String CANCEL = "cancel";
     public static final String INIT = "init";
     public static final String SETPERSISTENCEENABLED = "setPersistenceEnabled";
@@ -88,16 +88,16 @@ public class CDVFirebase extends CordovaPlugin {
     public static final String QUERYEQUALTOVALUECHILDKEY = "queryEqualToValueChildKey";
     public static final String QUERYSEARCH = "querySearch";
     public static final String USERLOGIN = "userLogin";
-    
+
     private CallbackContext mCallbackContext;
 
     /**
      * Constructor.
      */
     public CDVFirebase() {
-    	
+
     }
-    
+
     @Override
     protected void pluginInitialize() {
     	com.firebase.client.Firebase.setAndroidContext(this.cordova.getActivity().getApplicationContext());
@@ -419,37 +419,37 @@ public class CDVFirebase extends CordovaPlugin {
                 appName = data.getString(0);
             } catch (JSONException e) {
                 PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-                mCallbackContext.sendPluginResult(pluginResult);                
+                mCallbackContext.sendPluginResult(pluginResult);
                 e.printStackTrace();
                 return;
-            } 
+            }
         } else{
             PluginResult pluginResult = new PluginResult(Status.ERROR, "init : Parameter Error");
             mCallbackContext.sendPluginResult(pluginResult);
             return;
-        } 
+        }
         PluginResult pluginResult = new PluginResult(Status.OK);
         mCallbackContext.sendPluginResult(pluginResult);
     }
 
     private void setPersistenceEnabled(JSONArray data) {
-        
+
         if (isUsed == true) {
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "Can't modify config objects after they are in use for Firebase references.");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         boolean persistenceEnabled = true;
         if ( data.length() >= 1 ) {
             try {
             	persistenceEnabled = data.getBoolean(0);
             } catch (JSONException e) {
                 PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-                mCallbackContext.sendPluginResult(pluginResult);                
+                mCallbackContext.sendPluginResult(pluginResult);
                 e.printStackTrace();
                 return;
-            } 
+            }
         } else{
             PluginResult pluginResult = new PluginResult(Status.ERROR, "setPersistenceEnabled : Parameter Error");
             mCallbackContext.sendPluginResult(pluginResult);
@@ -471,51 +471,55 @@ public class CDVFirebase extends CordovaPlugin {
         myRootRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
-				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
-					//myRootRef = new Firebase(strURL);
-					myRootRef.keepSynced(true);
-					PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
-					pluginResult.setKeepCallback(true);
-					mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
-					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);
-					e.printStackTrace();
-				}
+                try {
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
+                    //myRootRef = new Firebase(strURL);
+                    myRootRef.keepSynced(true);
+                    PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
+                    pluginResult.setKeepCallback(true);
+                    mCallbackContext.sendPluginResult(pluginResult);
+                } catch (Exception e) {
+                    PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
+                    mCallbackContext.sendPluginResult(pluginResult);
+                    e.printStackTrace();
+                }
             }
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("The readData(addValueEventListener) failed: " + firebaseError.getMessage());
                 PluginResult pluginResult = new PluginResult(Status.ERROR, firebaseError.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);
+                mCallbackContext.sendPluginResult(pluginResult);
             }
         });
     }
     //Reading Data Once
     private void readDataOnceWithURL(JSONArray data) {
-    	
+
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
-        
+
         if ( data.length() >= 1 )
         {
         	try {
 				strURL = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
             PluginResult pluginResult = new PluginResult(Status.ERROR, "readDataOnceWithURL : Parameter Error");
             mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         Firebase myRootRef = new Firebase(strURL);
         if(isUsed != true)
             isUsed = true;
@@ -523,20 +527,23 @@ public class CDVFirebase extends CordovaPlugin {
         myRootRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
-				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
-	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
-	                //pluginResult.setKeepCallback(true);
-	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
-					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
-					e.printStackTrace();
-				}
+                try {
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
+                    PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
+                    //pluginResult.setKeepCallback(true);
+                    mCallbackContext.sendPluginResult(pluginResult);
+                } catch (Exception e) {
+                    PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
+                    mCallbackContext.sendPluginResult(pluginResult);
+                    e.printStackTrace();
+                }
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("The readDataOnceWithURL(addListenerForSingleValueEvent) failed: " + firebaseError.getMessage());
@@ -548,17 +555,17 @@ public class CDVFirebase extends CordovaPlugin {
     //remove all callbacks at a location
     private void removeAllCallbacksWithURL(JSONArray data) {
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
-        
+
         if ( data.length() >= 1 )
         {
         	try {
 				strURL = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "removeAllCallbacksWithURL : Parameter Error");
@@ -576,17 +583,17 @@ public class CDVFirebase extends CordovaPlugin {
     private void readValueTypeEventWithURL(JSONArray data) {
         //
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
-        
+
         if ( data.length() >= 1 )
         {
         	try {
 				strURL = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "readValueTypeEventWithURL : Parameter Error");
@@ -599,20 +606,23 @@ public class CDVFirebase extends CordovaPlugin {
         myChildRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
-				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
-	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
-	                //pluginResult.setKeepCallback(true);
-	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
-					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
-					e.printStackTrace();
-				}
+                try {
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
+                    PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
+                    //pluginResult.setKeepCallback(true);
+                    mCallbackContext.sendPluginResult(pluginResult);
+                } catch (Exception e) {
+                    PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
+                    mCallbackContext.sendPluginResult(pluginResult);
+                    e.printStackTrace();
+                }
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("The readValueTypeEventWithURL(addValueEventListener) failed: " + firebaseError.getMessage());
@@ -625,24 +635,24 @@ public class CDVFirebase extends CordovaPlugin {
     private void RetrieveChildAddedEventWithURL(JSONArray data) {
         //
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
-        
+
         if ( data.length() >= 1 )
         {
         	try {
 				strURL = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "RetrieveChildAddedEventWithURL : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-                
+
         Firebase myChildRef = new Firebase(strURL);
         if(isUsed != true)
             isUsed = true;
@@ -660,33 +670,33 @@ public class CDVFirebase extends CordovaPlugin {
 	                mCallbackContext.sendPluginResult(pluginResult);
 				} catch (JSONException e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
 			}
-			
+
 			@Override
 			public void onCancelled(FirebaseError arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void onChildMoved(DataSnapshot arg0, String arg1) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void onChildRemoved(DataSnapshot arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void onChildChanged(DataSnapshot arg0, String arg1) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
     }
@@ -695,30 +705,30 @@ public class CDVFirebase extends CordovaPlugin {
     private void RetrieveChildChangedEventWithURL(JSONArray data) {
         //
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
-        
+
         if ( data.length() >= 1 )
         {
         	try {
 				strURL = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "RetrieveChildAddedEventWithURL : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-                
+
         Firebase myChildRef = new Firebase(strURL);
         if(isUsed != true)
             isUsed = true;
         // Retrieve new posts as they are added to the database
         myChildRef.addChildEventListener(new ChildEventListener() {
-			
+
 			@Override
 			public void onChildChanged(DataSnapshot arg0, String arg1) {
 				//[result setKeepCallback:[NSNumber numberWithBool:YES]];
@@ -731,7 +741,7 @@ public class CDVFirebase extends CordovaPlugin {
 	                mCallbackContext.sendPluginResult(pluginResult);
 				} catch (JSONException e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
 			}
@@ -739,25 +749,25 @@ public class CDVFirebase extends CordovaPlugin {
 			@Override
 			public void onCancelled(FirebaseError arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void onChildAdded(DataSnapshot arg0, String arg1) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void onChildMoved(DataSnapshot arg0, String arg1) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void onChildRemoved(DataSnapshot arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
     }
@@ -766,30 +776,30 @@ public class CDVFirebase extends CordovaPlugin {
     private void RetrieveChildRemovedEventWithURL(JSONArray data) {
         //
     	String strURL = String.format("https://%s.firebaseio.com", appName);
-        
+
         if ( data.length() >= 1 )
         {
         	try {
 				strURL = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "RetrieveChildAddedEventWithURL : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-                
+
         Firebase myChildRef = new Firebase(strURL);
         if(isUsed != true)
             isUsed = true;
         // Retrieve new posts as they are added to the database
         myChildRef.addChildEventListener(new ChildEventListener() {
-			
+
 			@Override
 			public void onChildRemoved(DataSnapshot arg0) {
 				//[result setKeepCallback:[NSNumber numberWithBool:YES]];
@@ -802,7 +812,7 @@ public class CDVFirebase extends CordovaPlugin {
 	                mCallbackContext.sendPluginResult(pluginResult);
 				} catch (JSONException e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
 			}
@@ -810,25 +820,25 @@ public class CDVFirebase extends CordovaPlugin {
 			@Override
 			public void onCancelled(FirebaseError arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void onChildAdded(DataSnapshot arg0, String arg1) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void onChildChanged(DataSnapshot arg0, String arg1) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void onChildMoved(DataSnapshot arg0, String arg1) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
     }
@@ -838,17 +848,17 @@ public class CDVFirebase extends CordovaPlugin {
     	//
     	Object value;
     	String strURL = String.format("https://%s.firebaseio.com", appName);
-    	
+
         if ( data.length() >= 1 )
         {
         	try {
 				value = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "writeData : Parameter Error");
@@ -857,9 +867,9 @@ public class CDVFirebase extends CordovaPlugin {
         }
         Firebase myRootRef = new Firebase(strURL);
         isUsed = true;
-        
+
         if(value.getClass() == JSONArray.class){
-        	myRootRef.setValue((Object)toList((JSONArray)value), new Firebase.CompletionListener() {			
+        	myRootRef.setValue((Object)toList((JSONArray)value), new Firebase.CompletionListener() {
     			@Override
     			public void onComplete(FirebaseError arg0, Firebase arg1) {
     				if(arg0 == null){
@@ -872,7 +882,7 @@ public class CDVFirebase extends CordovaPlugin {
     			}
     		});
         }else if (value.getClass() == JSONObject.class){
-        	myRootRef.setValue((Object)jsonToMap((JSONObject)value), new Firebase.CompletionListener() {			
+        	myRootRef.setValue((Object)jsonToMap((JSONObject)value), new Firebase.CompletionListener() {
     			@Override
     			public void onComplete(FirebaseError arg0, Firebase arg1) {
     				if(arg0 == null){
@@ -886,7 +896,7 @@ public class CDVFirebase extends CordovaPlugin {
     		});
         }
         else{
-        	myRootRef.setValue(value, new Firebase.CompletionListener() {			
+        	myRootRef.setValue(value, new Firebase.CompletionListener() {
 				@Override
 				public void onComplete(FirebaseError arg0, Firebase arg1) {
 					if(arg0 == null){
@@ -909,7 +919,7 @@ public class CDVFirebase extends CordovaPlugin {
         }
         return retMap;
     }
-    
+
     public static Map<String, Object> toMap(JSONObject object){
         Map<String, Object> map = new HashMap<String, Object>();
 
@@ -918,11 +928,11 @@ public class CDVFirebase extends CordovaPlugin {
         	try{
 	            String key = keysItr.next();
 	            Object value = object.get(key);
-	
+
 	            if(value instanceof JSONArray) {
 	                value = toList((JSONArray) value);
 	            }
-	
+
 	            else if(value instanceof JSONObject) {
 	                value = toMap((JSONObject) value);
 	            }
@@ -933,7 +943,7 @@ public class CDVFirebase extends CordovaPlugin {
         }
         return map;
     }
-    
+
     public static List<Object> toList(JSONArray array){
         List<Object> list = new ArrayList<Object>();
         for(int i = 0; i < array.length(); i++) {
@@ -942,7 +952,7 @@ public class CDVFirebase extends CordovaPlugin {
 	            if(value instanceof JSONArray) {
 	                value = toList((JSONArray) value);
 	            }
-	
+
 	            else if(value instanceof JSONObject) {
 	                value = toMap((JSONObject) value);
 	            }
@@ -953,12 +963,12 @@ public class CDVFirebase extends CordovaPlugin {
         }
         return list;
     }
-    
+
     private void writeValueToURL(JSONArray data) {
     	//
     	Object value;
     	String strURL = String.format("https://%s.firebaseio.com", appName);
-    	
+
         if ( data.length() >= 2 )
         {
         	try {
@@ -966,10 +976,10 @@ public class CDVFirebase extends CordovaPlugin {
 				value = data.get(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "writeValueToURL : Parameter Error");
@@ -980,7 +990,7 @@ public class CDVFirebase extends CordovaPlugin {
         isUsed = true;
         //value = new JSONObject ("asdf":"asdf", "asdf1":"as");
         if(value.getClass() == JSONArray.class){
-        	myChildRef.setValue((Object)toList((JSONArray)value), new Firebase.CompletionListener() {			
+        	myChildRef.setValue((Object)toList((JSONArray)value), new Firebase.CompletionListener() {
     			@Override
     			public void onComplete(FirebaseError arg0, Firebase arg1) {
     				if(arg0 == null){
@@ -993,7 +1003,7 @@ public class CDVFirebase extends CordovaPlugin {
     			}
     		});
         }else if (value.getClass() == JSONObject.class){
-        	myChildRef.setValue((Object)jsonToMap((JSONObject)value), new Firebase.CompletionListener() {			
+        	myChildRef.setValue((Object)jsonToMap((JSONObject)value), new Firebase.CompletionListener() {
     			@Override
     			public void onComplete(FirebaseError arg0, Firebase arg1) {
     				if(arg0 == null){
@@ -1007,7 +1017,7 @@ public class CDVFirebase extends CordovaPlugin {
     		});
         }
         else{
-	        myChildRef.setValue(value, new Firebase.CompletionListener() {			
+	        myChildRef.setValue(value, new Firebase.CompletionListener() {
 				@Override
 				public void onComplete(FirebaseError arg0, Firebase arg1) {
 					if(arg0 == null){
@@ -1026,18 +1036,18 @@ public class CDVFirebase extends CordovaPlugin {
     	//
     	Object value;
     	String strURL = String.format("https://%s.firebaseio.com", appName);
-    	
+
         if ( data.length() >= 2 )
         {
         	try {
         		strURL = data.getString(0);
-				value = data.getString(1);
+				value = data.get(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "writeValueToURLWithAutoID : Parameter Error");
@@ -1047,20 +1057,48 @@ public class CDVFirebase extends CordovaPlugin {
         Firebase myChildRef = new Firebase(strURL);
         Firebase autoIDRef = myChildRef.push(); //Firebase *autoIDRef = [myChildRef childByAutoId];
         isUsed = true;
-        
-        autoIDRef.setValue(value, new Firebase.CompletionListener() {			
-			@Override
-			public void onComplete(FirebaseError arg0, Firebase arg1) {
-				if(arg0 == null){
-					PluginResult pluginResult = new PluginResult(Status.OK, arg1.getKey());
-					//pluginResult.setKeepCallback(true);
-					mCallbackContext.sendPluginResult(pluginResult);  //String autoId = autoIDRef.key;
-				}else{
-					PluginResult pluginResult = new PluginResult(Status.ERROR, arg0.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);
-				}
-			}
-		});
+
+        if(value.getClass() == JSONArray.class){
+            autoIDRef.setValue((Object)toList((JSONArray)value), new Firebase.CompletionListener() {
+                @Override
+                public void onComplete(FirebaseError arg0, Firebase arg1) {
+                    if(arg0 == null){
+                        PluginResult pluginResult = new PluginResult(Status.OK);
+                        mCallbackContext.sendPluginResult(pluginResult);
+                    }else{
+                        PluginResult pluginResult = new PluginResult(Status.ERROR, arg0.getMessage());
+                        mCallbackContext.sendPluginResult(pluginResult);
+                    }
+                }
+            });
+        }else if (value.getClass() == JSONObject.class){
+            autoIDRef.setValue((Object)jsonToMap((JSONObject)value), new Firebase.CompletionListener() {
+                @Override
+                public void onComplete(FirebaseError arg0, Firebase arg1) {
+                    if(arg0 == null){
+                        PluginResult pluginResult = new PluginResult(Status.OK);
+                        mCallbackContext.sendPluginResult(pluginResult);
+                    }else{
+                        PluginResult pluginResult = new PluginResult(Status.ERROR, arg0.getMessage());
+                        mCallbackContext.sendPluginResult(pluginResult);
+                    }
+                }
+            });
+        }
+        else{
+            autoIDRef.setValue(value, new Firebase.CompletionListener() {
+                @Override
+                public void onComplete(FirebaseError arg0, Firebase arg1) {
+                    if(arg0 == null){
+                        PluginResult pluginResult = new PluginResult(Status.OK);
+                        mCallbackContext.sendPluginResult(pluginResult);
+                    }else{
+                        PluginResult pluginResult = new PluginResult(Status.ERROR, arg0.getMessage());
+                        mCallbackContext.sendPluginResult(pluginResult);
+                    }
+                }
+            });
+        }
     }
 
     // Child set by Appending Path
@@ -1075,10 +1113,10 @@ public class CDVFirebase extends CordovaPlugin {
         		objData = data.getString(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "childSet : Parameter Error");
@@ -1089,10 +1127,10 @@ public class CDVFirebase extends CordovaPlugin {
         String strURL = String.format("https://%s.firebaseio.com", appName);
         Firebase myRootRef = new Firebase(strURL);
         isUsed = true;
-        
+
         Firebase childRef = myRootRef.child(path); //childByAppendingPath:path];
         childRef.setValue(objData, new Firebase.CompletionListener() {
-			
+
 			@Override
 			public void onComplete(FirebaseError arg0, Firebase arg1) {
 				if(arg0 == null){
@@ -1103,7 +1141,7 @@ public class CDVFirebase extends CordovaPlugin {
 					mCallbackContext.sendPluginResult(pluginResult);
 				}
 			}
-		});        
+		});
     }
 
     //Authenticate using the provided credentials.
@@ -1117,10 +1155,10 @@ public class CDVFirebase extends CordovaPlugin {
         		token = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "authWithCustomToken : Parameter Error");
@@ -1129,13 +1167,13 @@ public class CDVFirebase extends CordovaPlugin {
         }
         Firebase rootRef = new Firebase(strURL);
         rootRef.authWithCustomToken(token, new Firebase.AuthResultHandler() {
-			
+
 			@Override
 			public void onAuthenticationError(FirebaseError arg0) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, "authWithCustomToken : Error");
 				mCallbackContext.sendPluginResult(pluginResult);
 			}
-			
+
 			@Override
 			public void onAuthenticated(AuthData arg0) {
                 JSONObject resultObj;
@@ -1146,7 +1184,7 @@ public class CDVFirebase extends CordovaPlugin {
 	                mCallbackContext.sendPluginResult(pluginResult);
 				} catch (JSONException e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
 			}
@@ -1165,10 +1203,10 @@ public class CDVFirebase extends CordovaPlugin {
         		value = data.getString(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "onDisconnectSetValue : Parameter Error");
@@ -1176,7 +1214,7 @@ public class CDVFirebase extends CordovaPlugin {
         	return;
         }
 
-        Firebase urlRef = new Firebase(strURL);        
+        Firebase urlRef = new Firebase(strURL);
         urlRef.onDisconnect().setValue(value);
         PluginResult pluginResult = new PluginResult(Status.OK);
         mCallbackContext.sendPluginResult(pluginResult);
@@ -1193,10 +1231,10 @@ public class CDVFirebase extends CordovaPlugin {
         		value = data.getString(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "onDisconnectSetValue : Parameter Error");
@@ -1204,9 +1242,9 @@ public class CDVFirebase extends CordovaPlugin {
         	return;
         }
 
-        Firebase urlRef = new Firebase(strURL);        
+        Firebase urlRef = new Firebase(strURL);
         urlRef.onDisconnect().setValue(value, new Firebase.CompletionListener() {
-			
+
 			@Override
 			public void onComplete(FirebaseError arg0, Firebase arg1) {
 				if(arg0 == null){
@@ -1229,10 +1267,10 @@ public class CDVFirebase extends CordovaPlugin {
         		strURL = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "onDisconnectSetValue : Parameter Error");
@@ -1240,10 +1278,10 @@ public class CDVFirebase extends CordovaPlugin {
         	return;
         }
 
-        Firebase urlRef = new Firebase(strURL);        
+        Firebase urlRef = new Firebase(strURL);
         urlRef.onDisconnect().removeValue();
         PluginResult pluginResult = new PluginResult(Status.OK);
-        mCallbackContext.sendPluginResult(pluginResult);        
+        mCallbackContext.sendPluginResult(pluginResult);
     }
 
     private void onDisconnectRemoveValueWithCompletionBlock(JSONArray data) {
@@ -1255,10 +1293,10 @@ public class CDVFirebase extends CordovaPlugin {
         		strURL = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "onDisconnectSetValue : Parameter Error");
@@ -1266,9 +1304,9 @@ public class CDVFirebase extends CordovaPlugin {
         	return;
         }
 
-        Firebase urlRef = new Firebase(strURL);        
+        Firebase urlRef = new Firebase(strURL);
         urlRef.onDisconnect().removeValue(new Firebase.CompletionListener() {
-			
+
 			@Override
 			public void onComplete(FirebaseError arg0, Firebase arg1) {
 				if(arg0 == null){
@@ -1293,10 +1331,10 @@ public class CDVFirebase extends CordovaPlugin {
         		objData = data.getJSONObject(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "onDisconnectSetValue : Parameter Error");
@@ -1333,10 +1371,10 @@ public class CDVFirebase extends CordovaPlugin {
         		objData = data.getJSONObject(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "onDisconnect().UpdateChildValuesWithCompletionBlock : Parameter Error");
@@ -1357,7 +1395,7 @@ public class CDVFirebase extends CordovaPlugin {
 				return;
 			}
         }
-        urlRef.onDisconnect().updateChildren(update, new Firebase.CompletionListener() {			
+        urlRef.onDisconnect().updateChildren(update, new Firebase.CompletionListener() {
 			@Override
 			public void onComplete(FirebaseError arg0, Firebase arg1) {
 				if(arg0 == null){
@@ -1379,10 +1417,10 @@ public class CDVFirebase extends CordovaPlugin {
         		strURL = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "onDisconnect().cancel() : Parameter Error");
@@ -1390,7 +1428,7 @@ public class CDVFirebase extends CordovaPlugin {
         	return;
         }
         Firebase urlRef = new Firebase(strURL);
-        
+
         urlRef.onDisconnect().cancel();
         PluginResult pluginResult = new PluginResult(Status.OK);
         mCallbackContext.sendPluginResult(pluginResult);
@@ -1405,10 +1443,10 @@ public class CDVFirebase extends CordovaPlugin {
         		strURL = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "onDisconnect().cancel(): Parameter Error");
@@ -1416,7 +1454,7 @@ public class CDVFirebase extends CordovaPlugin {
         	return;
         }
         Firebase urlRef = new Firebase(strURL);
-        
+
         urlRef.onDisconnect().cancel(new Firebase.CompletionListener() {
 			@Override
 			public void onComplete(FirebaseError arg0, Firebase arg1) {
@@ -1437,7 +1475,7 @@ public class CDVFirebase extends CordovaPlugin {
     private void queryLimitedToNumberOfChildren(JSONArray data) {
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
     	int nLimit = 0;
-        
+
         if ( data.length() >= 2 )
         {
         	try {
@@ -1445,39 +1483,42 @@ public class CDVFirebase extends CordovaPlugin {
 				nLimit = data.getInt(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "queryLimitedToNumberOfChildren : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         Firebase urlRef = new Firebase(strURL);
-        
+
         if(isUsed != true)
             isUsed = true;
         // Read data and react to changes
         urlRef.limit(nLimit).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
 				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
 	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
 	                //pluginResult.setKeepCallback(true);
 	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("limit(limit).addListenerForSingleValueEvent failed: " + firebaseError.getMessage());
@@ -1491,7 +1532,7 @@ public class CDVFirebase extends CordovaPlugin {
     private void queryLimitedToFirst(JSONArray data) {
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
     	int nLimit = 0;
-        
+
         if ( data.length() >= 2 )
         {
         	try {
@@ -1499,39 +1540,42 @@ public class CDVFirebase extends CordovaPlugin {
 				nLimit = data.getInt(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "queryLimitedToFirst : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         Firebase urlRef = new Firebase(strURL);
-        
+
         if(isUsed != true)
             isUsed = true;
         // Read data and react to changes
         urlRef.limitToFirst(nLimit).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
 				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
 	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
 	                //pluginResult.setKeepCallback(true);
 	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("limitToFirst(limit).addListenerForSingleValueEvent failed: " + firebaseError.getMessage());
@@ -1545,7 +1589,7 @@ public class CDVFirebase extends CordovaPlugin {
     private void queryLimitedToLast(JSONArray data) {
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
     	int nLimit = 0;
-        
+
         if ( data.length() >= 2 )
         {
         	try {
@@ -1553,39 +1597,42 @@ public class CDVFirebase extends CordovaPlugin {
 				nLimit = data.getInt(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "queryLimitedToLast : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         Firebase urlRef = new Firebase(strURL);
-        
+
         if(isUsed != true)
             isUsed = true;
         // Read data and react to changes
         urlRef.limitToLast(nLimit).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
 				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
 	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
 	                //pluginResult.setKeepCallback(true);
 	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("LimitedToLast(limit).addListenerForSingleValueEvent failed: " + firebaseError.getMessage());
@@ -1599,7 +1646,7 @@ public class CDVFirebase extends CordovaPlugin {
     private void queryOrderedByChild(JSONArray data) {
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
     	String strChild;
-        
+
         if ( data.length() >= 2 )
         {
         	try {
@@ -1607,39 +1654,42 @@ public class CDVFirebase extends CordovaPlugin {
 				strChild = data.getString(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "queryOrderedByChild : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         Firebase urlRef = new Firebase(strURL);
-        
+
         if(isUsed != true)
             isUsed = true;
         // Read data and react to changes
         urlRef.orderByChild(strChild).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
 				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
 	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
 	                //pluginResult.setKeepCallback(true);
 	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("queryOrderedByChild(path).addListenerForSingleValueEvent failed: " + firebaseError.getMessage());
@@ -1652,60 +1702,63 @@ public class CDVFirebase extends CordovaPlugin {
     //Qeury Order By Key
     private void queryOrderedByKey(JSONArray data) {
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
-        
+
         if ( data.length() >= 1 )
         {
         	try {
 				strURL = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "queryOrderedByKey : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         Firebase urlRef = new Firebase(strURL);
-        
+
         if(isUsed != true)
             isUsed = true;
         // Read data and react to changes
         urlRef.orderByKey().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
 				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
-	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
+                    PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
 	                //pluginResult.setKeepCallback(true);
 	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("queryOrderedByKey().addListenerForSingleValueEvent failed: " + firebaseError.getMessage());
                 PluginResult pluginResult = new PluginResult(Status.ERROR, "queryOrderedByKey failded: " + firebaseError.getMessage());
                 mCallbackContext.sendPluginResult(pluginResult);
             }
-        });  
+        });
     }
 
     //Qeury Starting At Value
     private void queryStartingAtValue(JSONArray data) {
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
     	Object objStartValue;
-        
+
         if ( data.length() >= 2 )
         {
         	try {
@@ -1713,38 +1766,41 @@ public class CDVFirebase extends CordovaPlugin {
 				objStartValue = data.get(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "queryStartingAtValue : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         Firebase urlRef = new Firebase(strURL);
-        
+
         if(isUsed != true)
             isUsed = true;
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
 				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
 	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
 	                //pluginResult.setKeepCallback(true);
 	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("queryStartingAtValue().addListenerForSingleValueEvent failed: " + firebaseError.getMessage());
@@ -1761,7 +1817,7 @@ public class CDVFirebase extends CordovaPlugin {
         	urlRef.startAt((String)objStartValue).addListenerForSingleValueEvent(listener);
         else
         	urlRef.startAt(objStartValue.toString()).addListenerForSingleValueEvent(listener);
-        
+
     }
 
     //Qeury Starting At Value With Child Key
@@ -1769,7 +1825,7 @@ public class CDVFirebase extends CordovaPlugin {
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
     	String strChildKey;
     	Object objStartValue;
-        
+
         if ( data.length() >= 3 )
         {
         	try {
@@ -1778,38 +1834,41 @@ public class CDVFirebase extends CordovaPlugin {
 				strChildKey = data.getString(2);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "queryStartingAtValueChildKey : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         Firebase urlRef = new Firebase(strURL);
-        
+
         if(isUsed != true)
             isUsed = true;
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
 				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
 	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
 	                //pluginResult.setKeepCallback(true);
 	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("queryStartingAtValueChildKey().addListenerForSingleValueEvent failed: " + firebaseError.getMessage());
@@ -1817,7 +1876,7 @@ public class CDVFirebase extends CordovaPlugin {
                 mCallbackContext.sendPluginResult(pluginResult);
             }
         };
-        
+
         // Read data and react to changes
         if( objStartValue.getClass() == Double.class )
         	urlRef.startAt(((Double)objStartValue).doubleValue(), strChildKey).addListenerForSingleValueEvent(listener);
@@ -1833,7 +1892,7 @@ public class CDVFirebase extends CordovaPlugin {
     private void queryEndingAtValue(JSONArray data) {
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
     	Object objEndValue;
-        
+
         if ( data.length() >= 2 )
         {
         	try {
@@ -1841,38 +1900,41 @@ public class CDVFirebase extends CordovaPlugin {
 				objEndValue = data.get(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "queryEndingAtValue : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         Firebase urlRef = new Firebase(strURL);
-        
+
         if(isUsed != true)
             isUsed = true;
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
 				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
 	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
 	                //pluginResult.setKeepCallback(true);
 	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("queryEndingAtValue().addListenerForSingleValueEvent failed: " + firebaseError.getMessage());
@@ -1880,7 +1942,7 @@ public class CDVFirebase extends CordovaPlugin {
                 mCallbackContext.sendPluginResult(pluginResult);
             }
         };
-        
+
         if( objEndValue.getClass() == Double.class )
         	urlRef.endAt(((Double)objEndValue).doubleValue()).addListenerForSingleValueEvent(listener);
         else if(objEndValue.getClass() == Boolean.class )
@@ -1896,7 +1958,7 @@ public class CDVFirebase extends CordovaPlugin {
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
     	String strChildKey;
     	Object objEndValue;
-        
+
         if ( data.length() >= 3 )
         {
         	try {
@@ -1905,7 +1967,7 @@ public class CDVFirebase extends CordovaPlugin {
 				strChildKey = data.getString(2);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
 			}
@@ -1915,28 +1977,31 @@ public class CDVFirebase extends CordovaPlugin {
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         Firebase urlRef = new Firebase(strURL);
-        
+
         if(isUsed != true)
             isUsed = true;
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
 				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
 	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
 	                //pluginResult.setKeepCallback(true);
 	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("queryEndingAtValueChildKey().addListenerForSingleValueEvent failed: " + firebaseError.getMessage());
@@ -1944,7 +2009,7 @@ public class CDVFirebase extends CordovaPlugin {
                 mCallbackContext.sendPluginResult(pluginResult);
             }
         };
-        
+
         // Read data and react to changes
         if( objEndValue.getClass() == Double.class )
         	urlRef.endAt(((Double)objEndValue).doubleValue(), strChildKey).addListenerForSingleValueEvent(listener);
@@ -1960,7 +2025,7 @@ public class CDVFirebase extends CordovaPlugin {
     private void queryEqualToValue(JSONArray data) {
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
     	Object objValue;
-        
+
         if ( data.length() >= 2 )
         {
         	try {
@@ -1968,38 +2033,41 @@ public class CDVFirebase extends CordovaPlugin {
 				objValue = data.get(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "queryEqualToValue : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         Firebase urlRef = new Firebase(strURL);
-        
+
         if(isUsed != true)
             isUsed = true;
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
 				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
 	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
 	                //pluginResult.setKeepCallback(true);
 	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("queryEqualToValue().addListenerForSingleValueEvent failed: " + firebaseError.getMessage());
@@ -2023,7 +2091,7 @@ public class CDVFirebase extends CordovaPlugin {
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
     	String strChildKey;
     	Object objValue;
-        
+
         if ( data.length() >= 3 )
         {
         	try {
@@ -2032,38 +2100,41 @@ public class CDVFirebase extends CordovaPlugin {
 				strChildKey = data.getString(2);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "queryEqualToValueChildKey : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         Firebase urlRef = new Firebase(strURL);
-        
+
         if(isUsed != true)
             isUsed = true;
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
 				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
 	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
 	                //pluginResult.setKeepCallback(true);
 	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("queryEqualToValueChildKey().addListenerForSingleValueEvent failed: " + firebaseError.getMessage());
@@ -2071,7 +2142,7 @@ public class CDVFirebase extends CordovaPlugin {
                 mCallbackContext.sendPluginResult(pluginResult);
             }
         };
-        
+
         // Read data and react to changes
         if( objValue.getClass() == Double.class )
         	urlRef.equalTo(((Double)objValue).doubleValue(), strChildKey).addListenerForSingleValueEvent(listener);
@@ -2086,7 +2157,7 @@ public class CDVFirebase extends CordovaPlugin {
         QSearchAt_EQUAL(0),
         QSearchAt_STARTING(1),
         QSearchAt_ENDING(2);
-        
+
         private int index;
         private QSearchType(int value) {
         	this.index = value;
@@ -2100,7 +2171,7 @@ public class CDVFirebase extends CordovaPlugin {
         QOrderBy_NOT(0),
         QOrderBy_CHILDKEY(1),
         QOrderBy_CHILDVALUE(2);
-        
+
         private int index;
         private QOrderType(int value) {
         	this.index = value;
@@ -2114,7 +2185,7 @@ public class CDVFirebase extends CordovaPlugin {
         QLimitedTo_NOT(0),
         QLimitedTo_FIRST(1),
         QLimitedTo_LAST(2);
-        
+
         private int index;
         private QLimitType(int value) {
         	this.index = value;
@@ -2156,7 +2227,7 @@ public class CDVFirebase extends CordovaPlugin {
         //
         String strURL = String.format("https://%s.firebaseio.com", appName);
         JSONObject queryInfo;
-        
+
         QSearchType typeofSearch = QSearchType.QSearchAt_EQUAL;
         Object searchValue = null;
         String strSearchKey = "";
@@ -2164,17 +2235,17 @@ public class CDVFirebase extends CordovaPlugin {
         String strOrderValue = "";
         QLimitType typeofLimit = QLimitType.QLimitedTo_NOT;
         Integer numLimited = 0;
-        
+
        // String temp;
         if ( data.length() >= 2 )
         {
             strURL = data.getString(0);
             queryInfo = data.getJSONObject(1);
             {
-                if (queryInfo.getJSONObject("search") == null){
-                    typeofSearch = QSearchType.QSearchAt_STARTING;
-                    searchValue = "";
-                    strSearchKey = "";
+                if (!queryInfo.has("search")){
+//                    typeofSearch = QSearchType.QSearchAt_STARTING;
+//                    searchValue = "";
+//                    strSearchKey = "";
                 }
                 else {
                     if (queryInfo.getJSONObject("search").getString("type").compareTo("starting") == 0)
@@ -2186,15 +2257,15 @@ public class CDVFirebase extends CordovaPlugin {
                     searchValue = queryInfo.getJSONObject("search").get("value");
                     if (searchValue == null)
                         searchValue = "";
-                    
+
                     strSearchKey = queryInfo.getJSONObject("search").getString("child");
                     if (strSearchKey == null)
                         strSearchKey = "";
                 }
-                
-                if (queryInfo.getJSONObject("order") == null){
-                    typeofOrder = QOrderType.QOrderBy_NOT;
-                    strOrderValue = "";
+
+                if (!queryInfo.has("order")){
+//                    typeofOrder = QOrderType.QOrderBy_NOT;
+//                    strOrderValue = "";
                 }
                 else {
                     if (queryInfo.getJSONObject("order").getString("by").compareTo("key") == 0)
@@ -2203,15 +2274,15 @@ public class CDVFirebase extends CordovaPlugin {
                         typeofOrder = QOrderType.QOrderBy_CHILDVALUE;
                     else
                         typeofOrder = QOrderType.QOrderBy_NOT;
-                    
+
                     strOrderValue = queryInfo.getJSONObject("order").getString("field");
                     if (strOrderValue == null)
                         strOrderValue = "";
                 }
-                
-                if (queryInfo.getJSONObject("limit") == null) {
-                    typeofLimit = QLimitType.QLimitedTo_NOT;
-                    numLimited = 0;
+
+                if (!queryInfo.has("limit")) {
+//                    typeofLimit = QLimitType.QLimitedTo_NOT;
+//                    numLimited = 0;
                 }
                 else{
                     if (queryInfo.getJSONObject("limit").getString("at").compareTo("first") == 0)
@@ -2220,7 +2291,7 @@ public class CDVFirebase extends CordovaPlugin {
                         typeofLimit = QLimitType.QLimitedTo_LAST;
                     else
                         typeofLimit = QLimitType.QLimitedTo_NOT;
-                    
+
                     if (queryInfo.getJSONObject("limit").isNull("num"))
                         numLimited = 0;
                     else
@@ -2228,24 +2299,24 @@ public class CDVFirebase extends CordovaPlugin {
                 }
             }
         }
-        
-        Firebase urlRef = new Firebase(strURL);        
+
+        Firebase urlRef = new Firebase(strURL);
         Query queryOrder = null;
-        
+
         switch (typeofOrder) {
-            case QOrderBy_NOT:  
+            case QOrderBy_NOT:
             default:
             case QOrderBy_CHILDKEY:
                 queryOrder = urlRef.orderByKey();
                 break;
-                
+
             case QOrderBy_CHILDVALUE:
                 queryOrder = urlRef.orderByChild(strOrderValue);
                 break;
         }
 
         Query queryObj = null;
-        
+
         switch (typeofSearch) {
             case QSearchAt_EQUAL:
                 if(strSearchKey == null | strSearchKey.length() == 0){
@@ -2269,7 +2340,7 @@ public class CDVFirebase extends CordovaPlugin {
                     	queryObj = queryOrder.equalTo(searchValue.toString(), strSearchKey);
                 }
                 break;
-                
+
             case QSearchAt_STARTING:
                 if(strSearchKey == null | strSearchKey.length() == 0){
                 	if( searchValue.getClass() == Double.class )
@@ -2292,7 +2363,7 @@ public class CDVFirebase extends CordovaPlugin {
                     	queryObj = queryOrder.startAt(searchValue.toString(), strSearchKey);
                 }
                 break;
-                
+
             case QSearchAt_ENDING:
                 if(strSearchKey == null | strSearchKey.length() == 0){
                 	if( searchValue.getClass() == Double.class )
@@ -2315,7 +2386,7 @@ public class CDVFirebase extends CordovaPlugin {
                     	queryObj = queryOrder.endAt(searchValue.toString(), strSearchKey);
                 }
                 break;
-                
+
             default:
             	queryObj = queryOrder.startAt();//queryObj = [queryOrder queryStartingAtValue:nil];
                 break;
@@ -2336,27 +2407,30 @@ public class CDVFirebase extends CordovaPlugin {
         queryLimit.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getValue());
                 JSONObject resultObj;
 				try {
-					resultObj = new JSONObject(snapshot.getValue().toString());
+                    HashMap result = snapshot.getValue(HashMap.class);
+                    if (result == null)
+                        resultObj = new JSONObject();
+                    else
+                        resultObj = new JSONObject(result);
 	                PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
 	                //pluginResult.setKeepCallback(true);
 	                mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-					mCallbackContext.sendPluginResult(pluginResult);					
+					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
             }
-            
+
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.out.println("The querySearch(addListenerForSingleValueEvent) failed: " + firebaseError.getMessage());
                 PluginResult pluginResult = new PluginResult(Status.ERROR, "The querySearch failded: " + firebaseError.getMessage());
                 mCallbackContext.sendPluginResult(pluginResult);
             }
-        });        
+        });
     }
 
     //User Log in
@@ -2364,7 +2438,7 @@ public class CDVFirebase extends CordovaPlugin {
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
     	String userName;
     	String password;
-        
+
         if ( data.length() >= 2 )
         {
         	try {
@@ -2372,26 +2446,26 @@ public class CDVFirebase extends CordovaPlugin {
 				password = data.getString(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
-				mCallbackContext.sendPluginResult(pluginResult);	        	
+				mCallbackContext.sendPluginResult(pluginResult);
 				e.printStackTrace();
 				return;
-			} 
+			}
         }
         else{
         	PluginResult pluginResult = new PluginResult(Status.ERROR, "queryEqualToValue : Parameter Error");
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        
+
         Firebase rootRef = new Firebase(strURL);
         rootRef.authWithPassword(userName, password, new Firebase.AuthResultHandler() {
-			
+
 			@Override
 			public void onAuthenticationError(FirebaseError arg0) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, "authWithPassword failded: " + arg0.getMessage());
 				mCallbackContext.sendPluginResult(pluginResult);
 			}
-			
+
 			@Override
 			public void onAuthenticated(AuthData arg0) {
 				JSONObject obj;
@@ -2400,12 +2474,12 @@ public class CDVFirebase extends CordovaPlugin {
 					PluginResult pluginResult = new PluginResult(Status.OK, obj);
 					//pluginResult.setKeepCallback(true);
 					mCallbackContext.sendPluginResult(pluginResult);
-				} catch (JSONException e) {					
+				} catch (JSONException e) {
 					PluginResult pluginResult = new PluginResult(Status.ERROR, "AuthData failded: " + e.getMessage());
 					mCallbackContext.sendPluginResult(pluginResult);
 					e.printStackTrace();
 				}
 			}
-		});        
+		});
     }
 }
