@@ -992,11 +992,12 @@ public class CDVFirebase extends CordovaPlugin {
     	//
     	Object value;
     	String strURL = String.format("https://%s.firebaseio.com", appName);
+        String path;
 
         if ( data.length() >= 2 )
         {
         	try {
-        		strURL = data.getString(0);
+        		path = data.getString(0);
 				value = data.get(1);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
@@ -1010,7 +1011,8 @@ public class CDVFirebase extends CordovaPlugin {
         	mCallbackContext.sendPluginResult(pluginResult);
         	return;
         }
-        Firebase myChildRef = new Firebase(strURL);
+        Firebase ref = new Firebase(strURL);
+        Firebase myChildRef = ref.child(path);
         isUsed = true;
         //value = new JSONObject ("asdf":"asdf", "asdf1":"as");
         if(value.getClass() == JSONArray.class){
