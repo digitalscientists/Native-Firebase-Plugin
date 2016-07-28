@@ -526,11 +526,12 @@ public class CDVFirebase extends CordovaPlugin {
     private void readDataOnceWithURL(JSONArray data) {
 
     	String strURL = String.format("https://%s.firebaseio.com", appName); // = "https://%@.firebaseio.com" + appName;
+        String path;
 
         if ( data.length() >= 1 )
         {
         	try {
-				strURL = data.getString(0);
+				path = data.getString(0);
 			} catch (JSONException e) {
 				PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
 				mCallbackContext.sendPluginResult(pluginResult);
@@ -548,7 +549,7 @@ public class CDVFirebase extends CordovaPlugin {
         if(isUsed != true)
             isUsed = true;
         // Read data and react to changes
-        myRootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        myRootRef.child(path).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 JSONObject resultObj;
