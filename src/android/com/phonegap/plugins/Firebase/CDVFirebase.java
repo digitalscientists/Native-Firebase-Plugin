@@ -464,11 +464,35 @@ public class CDVFirebase extends CordovaPlugin {
     private void readData(JSONArray data) {
         //
         String strURL = String.format("https://%s.firebaseio.com", appName);
+        String path, child, value;
         final Firebase myRootRef = new Firebase(strURL);
+
+        if ( data.length() >= 1 )
+        {
+            try {
+                path = data.getString(0);
+                child = data.getString(1);
+                value = data.getString(2);
+            } catch (JSONException e) {
+                PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
+                mCallbackContext.sendPluginResult(pluginResult);
+                e.printStackTrace();
+                return;
+            }
+        }
+        else{
+            PluginResult pluginResult = new PluginResult(Status.ERROR, "readDataOnceWithURL : Parameter Error");
+            mCallbackContext.sendPluginResult(pluginResult);
+            return;
+        }
+
+        Firebase myChildRef = myRootRef.child(path);
+        Query query = myChildRef.orderByChild(child).equalTo(value);
+        query.keepSynced(true);
         if(isUsed != true)
             isUsed = true;
         // Read data and react to changes
-        myRootRef.addValueEventListener(new ValueEventListener() {
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 JSONObject resultObj;
@@ -478,7 +502,7 @@ public class CDVFirebase extends CordovaPlugin {
                         resultObj = new JSONObject();
                     else
                         resultObj = new JSONObject(result);
-                    //myRootRef = new Firebase(strURL);
+
                     myRootRef.keepSynced(true);
                     PluginResult pluginResult = new PluginResult(Status.OK, resultObj);
                     pluginResult.setKeepCallback(true);
@@ -2404,6 +2428,7 @@ public class CDVFirebase extends CordovaPlugin {
                 queryLimit = queryObj.limitToLast(numLimited);
             break;
         }
+
         queryLimit.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {

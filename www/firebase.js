@@ -57,7 +57,7 @@ FireBase.prototype.setPersistenceEnabled = function (persistenceEnabled, success
         errorCallback = function () {
         };
     }
-    
+
     if (successCallback == null) {
         successCallback = function () {
         };
@@ -77,7 +77,7 @@ FireBase.prototype.setPersistenceEnabled = function (persistenceEnabled, success
 };
 
 //-------------------------------------------------------------------
-FireBase.prototype.readData = function (successCallback, errorCallback) {
+FireBase.prototype.readData = function (path,key, value, successCallback, errorCallback) {
     if (errorCallback == null) {
         errorCallback = function () {
         };
@@ -93,7 +93,7 @@ FireBase.prototype.readData = function (successCallback, errorCallback) {
         return;
     }
 
-    exec(successCallback, errorCallback, 'FireBase', 'readData', []);
+    exec(successCallback, errorCallback, 'FireBase', 'readData', [path,key,value]);
 };
 
 //-------------------------------------------------------------------
@@ -698,20 +698,20 @@ FireBase.prototype.queryEqualToValueChildKey = function (strURL, idValue, strChi
 
 /*-------------------------------------------------------------------
 * querySearch: is used to generate a Dictionary reference to a limited, ordered view of the data at selected location.
-* The Dictionary reference returned by querySearch: will respond to events as node with a value 
+* The Dictionary reference returned by querySearch: will respond to events as node with a value
 * equal to / starting at / ending at the suplied argument with a key equal to / starting at / ending at childKey.
-* 
+*
 * @param strURL - The full url string for Firebase database
 * @param queryInfo - A dictionary instance of Query.
 * @return  - A Dictionary instance, limited to / ordered by data with the supplied values and the keys.
 *
 * ex:
 *       queryInfo = {
-*           order: {            // if this key is nil, not order 
+*           order: {            // if this key is nil, not order
 *               by: 'value',          // 'key', 'value' or nil
 *               field: 'height'       // if the key "by" is 'key', doesn't use this key but if not, use.
 *           },
-*           search: {           
+*           search: {
 *               type: 'starting',   //'starting', 'ending' 'equal' or nil
 *               value: 3,           // object
 *               child: ''           // string   //if this key is nil or empty, doesn't use.
