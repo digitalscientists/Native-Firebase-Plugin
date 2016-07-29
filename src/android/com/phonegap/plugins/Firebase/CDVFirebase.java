@@ -24,6 +24,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
+import com.shaded.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -1030,7 +1031,17 @@ public class CDVFirebase extends CordovaPlugin {
     			}
     		});
         }else if (value.getClass() == JSONObject.class){
-        	myChildRef.setValue((Object)jsonToMap((JSONObject)value), new Firebase.CompletionListener() {
+            HashMap<String,Object> result;
+            try{
+                result = new ObjectMapper().readValue(value.toString(), HashMap.class);
+            } catch (Exception e){
+                PluginResult pluginResult = new PluginResult(Status.ERROR, e.getMessage());
+                mCallbackContext.sendPluginResult(pluginResult);
+                e.printStackTrace();
+                return;
+            }
+
+        	myChildRef.updateChildren(result, new Firebase.CompletionListener() {
     			@Override
     			public void onComplete(FirebaseError arg0, Firebase arg1) {
     				if(arg0 == null){
